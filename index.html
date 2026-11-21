@@ -366,8 +366,97 @@
   </div>
 
 
+  <!-- CHECKOUT & PAYMENT PROOF MODAL -->
+  <div id="pubCheckoutModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card rounded-2xl border border-gold/45 w-full max-w-2xl p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-3 border-b border-gold/20 pb-3">
+        <div>
+          <span class="text-[11px] font-bold text-goldBright uppercase tracking-wider">إتمام الشراء وتفعيل التحميل</span>
+          <h3 id="chkProdTitle" class="text-lg font-extrabold text-white mt-0.5"></h3>
+          <div id="chkProdPrice" class="text-sm font-mono font-extrabold text-goldBright"></div>
+        </div>
+        <button type="button" id="closeCheckoutModalBtn" class="px-2.5 py-1 rounded-lg bg-navyLight text-slate-300 hover:text-white text-xs font-bold">✕ إغلاق</button>
+      </div>
+
+      <!-- STEP 1: PAYMENT INFO & RECEIPT FORM -->
+      <div id="chkFormSection" class="space-y-4">
+        <div class="rounded-xl bg-obsidian/90 border border-gold/30 p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold text-goldBright">1. قم بالتحويل عبر إحدى طرق الدفع المعتمدة:</h4>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-gold/15 text-goldBright font-bold">تفعيل بعد المراجعة</span>
+          </div>
+          <div class="grid grid-cols-1 gap-2 text-xs">
+            <div class="flex items-center justify-between gap-2 bg-navyLight/70 rounded-lg px-3 py-2 border border-slate-800">
+              <div class="min-w-0">
+                <span class="text-[10px] text-slate-400 block">Binance Pay (معرف بايننس)</span>
+                <code class="font-mono text-goldBright font-bold select-all">865764154</code>
+              </div>
+              <button type="button" data-copy-text="865764154" class="shrink-0 px-2.5 py-1 rounded bg-gold/20 hover:bg-gold/30 text-goldBright text-[11px] font-bold">نسخ</button>
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-navyLight/70 rounded-lg px-3 py-2 border border-slate-800">
+              <div class="min-w-0">
+                <span class="text-[10px] text-slate-400 block">USDT — شبكة BSC (BEP20)</span>
+                <code class="font-mono text-[11px] text-goldBright truncate block select-all">0xe375da098b6e527fe21c27d6448ebd856e61a235</code>
+              </div>
+              <button type="button" data-copy-text="0xe375da098b6e527fe21c27d6448ebd856e61a235" class="shrink-0 px-2.5 py-1 rounded bg-gold/20 hover:bg-gold/30 text-goldBright text-[11px] font-bold">نسخ</button>
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-navyLight/70 rounded-lg px-3 py-2 border border-slate-800">
+              <div class="min-w-0">
+                <span class="text-[10px] text-slate-400 block">USDT — شبكة TRX (TRC20)</span>
+                <code class="font-mono text-[11px] text-goldBright truncate block select-all">TLfUXGwnE1ScMW917HRpEbnmYTtepwm1rL</code>
+              </div>
+              <button type="button" data-copy-text="TLfUXGwnE1ScMW917HRpEbnmYTtepwm1rL" class="shrink-0 px-2.5 py-1 rounded bg-gold/20 hover:bg-gold/30 text-goldBright text-[11px] font-bold">نسخ</button>
+            </div>
+          </div>
+        </div>
+
+        <form id="pubCheckoutForm" class="space-y-3">
+          <h4 class="text-xs font-extrabold text-goldBright">2. أرفق بياناتك وصورة إيصال الدفع:</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input id="chkBuyerName" type="text" required placeholder="الاسم الكامل" class="px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-xs sm:text-sm text-white focus:border-gold focus:outline-none" />
+            <input id="chkContact" type="text" required placeholder="رقم الواتساب أو معرف تيليجرام أو البريد" class="px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-xs sm:text-sm text-white focus:border-gold focus:outline-none" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <select id="chkMethod" class="px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-xs sm:text-sm text-white focus:border-gold focus:outline-none">
+              <option value="Binance Pay">Binance Pay</option>
+              <option value="USDT BSC (BEP20)">USDT — شبكة BSC (BEP20)</option>
+              <option value="USDT TRX (TRC20)">USDT — شبكة TRX (TRC20)</option>
+              <option value="تحويل آخر">وسيلة دفع أخرى</option>
+            </select>
+            <input id="chkTxRef" type="text" placeholder="رقم العملية TxID (اختياري)" class="px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-xs sm:text-sm text-white focus:border-gold focus:outline-none" />
+          </div>
+          <div class="space-y-2">
+            <label for="chkReceiptFile" class="block text-xs text-slate-300 font-bold">صورة إيصال الدفع (مطلوبة):</label>
+            <input id="chkReceiptFile" type="file" accept="image/*" required class="w-full text-xs text-slate-300 file:ml-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gold/20 file:text-goldBright hover:file:bg-gold/30 bg-obsidian border border-slate-700 rounded-xl p-1.5" />
+            <img id="chkReceiptPreview" class="hidden max-h-40 rounded-xl border border-gold/30 object-contain mx-auto" alt="معاينة الإيصال" />
+          </div>
+          <button id="chkSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs sm:text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-gold/20">
+            إرسال طلب الشراء وإثبات الدفع
+          </button>
+        </form>
+      </div>
+
+      <!-- STEP 2: LIVE ORDER STATUS & DOWNLOAD UNLOCK -->
+      <div id="chkStatusSection" class="hidden space-y-4 text-center py-3">
+        <div id="chkStatusBadge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold"></div>
+        <p id="chkStatusText" class="text-sm text-slate-300 leading-relaxed"></p>
+        <div class="text-xs text-slate-400">رقم الطلب: <code id="chkOrderIdDisplay" class="text-goldBright font-mono font-bold"></code></div>
+        <div id="chkDownloadBox" class="hidden pt-2">
+          <a id="chkDownloadLink" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-obsidian text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-emerald-500/25">
+            ⬇️ تحميل المنتج الآن
+          </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button type="button" id="chkRefreshStatusBtn" class="px-4 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">🔄 تحديث الحالة الآن</button>
+          <button type="button" id="chkNewOrderBtn" class="px-4 py-2 rounded-xl bg-obsidian border border-slate-700 text-slate-300 text-xs font-bold hover:text-white transition">إرسال طلب جديد</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="pubToast" class="fixed bottom-5 left-5 z-50 hidden px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xl"></div>
   <script>
+    const MGD_API_URL = 'https://mgd-product-bot.amjdmjd319.workers.dev';
     const SUPABASE_URL = 'https://htahkllrkireofpvzsma.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_DS2MPbWcUDTOXS9brQx-nA_bmzBrAPK';
     // === MGD_PRODUCTS_CATALOG_START ===
@@ -1363,9 +1452,13 @@
       const byId = new Map(products.map(p => [p.id, p]));
       extraList.forEach(item => {
         if (!item || !item.id) return;
-        if (item.deleted) byId.delete(item.id);
-        else if (byId.has(item.id)) byId.set(item.id, { ...byId.get(item.id), ...item });
-        else byId.set(item.id, item);
+        if (item.deleted) {
+          byId.delete(item.id);
+        } else if (byId.has(item.id)) {
+          byId.set(item.id, { ...byId.get(item.id), ...item });
+        } else {
+          byId.set(item.id, item);
+        }
       });
       products = Array.from(byId.values());
       renderPublicStore();
@@ -1429,10 +1522,9 @@
         }
         const orderBtn = e.target.closest('[data-order-product]');
         if (orderBtn) {
-          const prodName = orderBtn.dataset.orderProduct;
-          switchPublicPage('support');
-          const topicEl = document.getElementById('supTopic');
-          if (topicEl) topicEl.value = 'طلب منتج: ' + prodName;
+          const prodId = orderBtn.dataset.orderProductId || '';
+          const prod = products.find(x => x.id === prodId || x.name === orderBtn.dataset.orderProduct);
+          if (prod) openCheckoutModal(prod);
           return;
         }
         const detBtn = e.target.closest('[data-pub-detail]');
@@ -1443,6 +1535,9 @@
             const feats = Array.isArray(p.features) && p.features.length
               ? `<ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-2">${p.features.map(f => `<li class="flex items-center gap-2"><span class="text-goldBright">✓</span><span>${escHtml(f)}</span></li>`).join('')}</ul>`
               : '';
+            const savedOrders = getSavedOrders();
+            const hasSavedOrder = Boolean(savedOrders[p.id]);
+            const isFree = Number(p.price) === 0;
             box.innerHTML = `
               <div class="flex items-start justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -1459,13 +1554,13 @@
                 <div><span class="text-slate-400 block">المنصة</span><strong class="text-goldBright">${escHtml(p.platform)}</strong></div>
                 <div><span class="text-slate-400 block">الحالة</span><strong class="text-emerald-400">${escHtml(p.status || 'متاح')}</strong></div>
                 <div><span class="text-slate-400 block">الأسواق / الفريم</span><strong class="text-white">${escHtml(p.symbol || 'متعدد')} (${escHtml(p.timeframe || 'مرن')})</strong></div>
-                <div><span class="text-slate-400 block">السعر</span><strong class="text-goldBright font-mono">${p.oldPrice ? `<span class="text-[11px] text-slate-400 line-through font-mono mr-1">$${Number(p.oldPrice).toLocaleString('en-US')}</span>` : ''}${(p.price === null || p.price === undefined || p.price === '') ? escHtml(p.priceLabel || 'حسب الاتفاق') : (Number(p.price) === 0 ? 'مجاني' : '$' + Number(p.price).toLocaleString('en-US'))}</strong></div>
+                <div><span class="text-slate-400 block">السعر</span><strong class="text-goldBright font-mono">${p.oldPrice ? `<span class="text-[11px] text-slate-400 line-through font-mono mr-1">$${Number(p.oldPrice).toLocaleString('en-US')}</span>` : ''}${(p.price === null || p.price === undefined || p.price === '') ? escHtml(p.priceLabel || 'حسب الاتفاق') : (isFree ? 'مجاني' : '$' + Number(p.price).toLocaleString('en-US'))}</strong></div>
               </div>
               ${feats}
               ${p.fileName ? `<div class="text-xs text-slate-400">ملف المنتج: <code class="text-goldBright font-mono">${escHtml(p.fileName)}</code></div>` : ''}
               <div class="flex flex-wrap gap-3 pt-2">
-                <button type="button" data-order-product="${escHtml(p.name)}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">طلب شراء / تفعيل الترخيص</button>
-                ${p.downloadUrl ? `<a href="${escHtml(p.downloadUrl)}" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-600/30 transition">تنزيل الملف مباشرة</a>` : ''}
+                <button type="button" data-order-product="${escHtml(p.name)}" data-order-product-id="${escHtml(p.id)}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">${hasSavedOrder ? 'متابعة طلبك / تحميل المنتج' : 'شراء المنتج الآن'}</button>
+                ${isFree && p.downloadUrl ? `<a href="${escHtml(p.downloadUrl)}" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-600/30 transition">تنزيل مجاني مباشر</a>` : ''}
                 <a href="https://ct.topfx.com/?u=AliAmjd" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">تفعيل مجاني عبر TopFX</a>
               </div>
             `;
@@ -1475,6 +1570,206 @@
           }
         }
       });
+
+      /* === CHECKOUT & ORDER TRACKING LOGIC === */
+      let activeCheckoutProduct = null;
+      let activeOrderPollTimer = null;
+
+      function getSavedOrders() {
+        try { return JSON.parse(localStorage.getItem('mgd_customer_orders') || '{}'); } catch { return {}; }
+      }
+      function saveOrderLocal(productId, info) {
+        try {
+          const all = getSavedOrders();
+          all[productId] = info;
+          localStorage.setItem('mgd_customer_orders', JSON.stringify(all));
+        } catch {}
+      }
+      function removeOrderLocal(productId) {
+        try {
+          const all = getSavedOrders();
+          delete all[productId];
+          localStorage.setItem('mgd_customer_orders', JSON.stringify(all));
+        } catch {}
+      }
+
+      function compressReceiptFile(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('تعذّر قراءة صورة الإيصال'));
+          reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => resolve({ base64: String(reader.result), mime: file.type || 'image/jpeg' });
+            img.onload = () => {
+              const maxSide = 1280;
+              let w = img.width, h = img.height;
+              if (w > maxSide || h > maxSide) {
+                if (w >= h) { h = Math.round((h * maxSide) / w); w = maxSide; }
+                else { w = Math.round((w * maxSide) / h); h = maxSide; }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+              resolve({ base64: canvas.toDataURL('image/jpeg', 0.82), mime: 'image/jpeg' });
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function stopOrderPolling() {
+        if (activeOrderPollTimer) { clearInterval(activeOrderPollTimer); activeOrderPollTimer = null; }
+      }
+
+      async function checkOrderStatus(orderInfo) {
+        if (!orderInfo || !orderInfo.orderId) return;
+        const badge = document.getElementById('chkStatusBadge');
+        const text = document.getElementById('chkStatusText');
+        const dlBox = document.getElementById('chkDownloadBox');
+        const dlLink = document.getElementById('chkDownloadLink');
+        document.getElementById('chkOrderIdDisplay').textContent = orderInfo.orderId;
+
+        try {
+          const res = await fetch(`${MGD_API_URL}/api/orders/${encodeURIComponent(orderInfo.orderId)}?token=${encodeURIComponent(orderInfo.accessToken)}`, { cache: 'no-store' });
+          const data = await res.json();
+          if (!res.ok || !data.ok) return;
+
+          if (data.status === 'approved') {
+            badge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold bg-emerald-500/20 border border-emerald-400/50 text-emerald-300';
+            badge.textContent = '✅ تمت الموافقة على الطلب';
+            if (data.downloadReadyUrl) {
+              text.textContent = 'تم تأكيد الدفع بنجاح! يمكنك الآن تحميل منتجك مباشرة من الزر أدناه:';
+              dlLink.href = data.downloadReadyUrl;
+              dlLink.textContent = data.fileName ? `⬇️ تحميل ${data.fileName}` : '⬇️ تحميل المنتج الآن';
+              dlBox.classList.remove('hidden');
+              stopOrderPolling();
+            } else {
+              text.textContent = 'تم تأكيد الدفع والموافقة على طلبك! يقوم الفريق الآن بإرفاق ملف التحميل وسيظهر زر التحميل هنا تلقائياً خلال لحظات...';
+              dlBox.classList.add('hidden');
+            }
+          } else if (data.status === 'rejected') {
+            badge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold bg-rose-500/20 border border-rose-400/50 text-rose-300';
+            badge.textContent = '❌ لم يتم تأكيد الدفع';
+            text.textContent = 'تم رفض الطلب لعدم مطابقة إثبات الدفع. يرجى التأكد من الإيصال أو التواصل مع الدعم الفني.';
+            dlBox.classList.add('hidden');
+            stopOrderPolling();
+          } else {
+            badge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold bg-gold/20 border border-gold/40 text-goldBright';
+            badge.textContent = '⏳ قيد المراجعة والتأكيد';
+            text.textContent = 'تم استلام طلب الشراء وصورة إيصال الدفع وإرسالها للفريق. فور الموافقة سيظهر زر تحميل المنتج هنا تلقائياً.';
+            dlBox.classList.add('hidden');
+          }
+        } catch {}
+      }
+
+      function showOrderStatusView(orderInfo) {
+        document.getElementById('chkFormSection').classList.add('hidden');
+        document.getElementById('chkStatusSection').classList.remove('hidden');
+        checkOrderStatus(orderInfo);
+        stopOrderPolling();
+        activeOrderPollTimer = setInterval(() => checkOrderStatus(orderInfo), 5000);
+      }
+
+      function openCheckoutModal(prod) {
+        activeCheckoutProduct = prod;
+        const modal = document.getElementById('pubCheckoutModal');
+        const priceText = (prod.price === null || prod.price === undefined || prod.price === '')
+          ? (prod.priceLabel || 'حسب الاتفاق')
+          : (Number(prod.price) === 0 ? 'مجاني' : '$' + Number(prod.price).toLocaleString('en-US'));
+        document.getElementById('chkProdTitle').textContent = `${prod.name} (${prod.platform || 'MT5'})`;
+        document.getElementById('chkProdPrice').textContent = `السعر: ${priceText}`;
+        modal.classList.remove('hidden');
+
+        const saved = getSavedOrders()[prod.id];
+        if (saved) {
+          showOrderStatusView(saved);
+        } else {
+          stopOrderPolling();
+          document.getElementById('chkStatusSection').classList.add('hidden');
+          document.getElementById('chkFormSection').classList.remove('hidden');
+          document.getElementById('pubCheckoutForm').reset();
+          document.getElementById('chkReceiptPreview').classList.add('hidden');
+        }
+      }
+
+      document.getElementById('closeCheckoutModalBtn').addEventListener('click', () => {
+        stopOrderPolling();
+        document.getElementById('pubCheckoutModal').classList.add('hidden');
+      });
+
+      document.getElementById('chkReceiptFile').addEventListener('change', e => {
+        const file = e.target.files?.[0];
+        const preview = document.getElementById('chkReceiptPreview');
+        if (!file) { preview.classList.add('hidden'); return; }
+        const r = new FileReader();
+        r.onload = () => { preview.src = r.result; preview.classList.remove('hidden'); };
+        r.readAsDataURL(file);
+      });
+
+      document.getElementById('chkRefreshStatusBtn').addEventListener('click', () => {
+        if (!activeCheckoutProduct) return;
+        const saved = getSavedOrders()[activeCheckoutProduct.id];
+        if (saved) { checkOrderStatus(saved); showToast('جاري تحديث حالة الطلب...'); }
+      });
+
+      document.getElementById('chkNewOrderBtn').addEventListener('click', () => {
+        if (!activeCheckoutProduct) return;
+        stopOrderPolling();
+        removeOrderLocal(activeCheckoutProduct.id);
+        document.getElementById('chkStatusSection').classList.add('hidden');
+        document.getElementById('chkFormSection').classList.remove('hidden');
+        document.getElementById('pubCheckoutForm').reset();
+        document.getElementById('chkReceiptPreview').classList.add('hidden');
+      });
+
+      document.getElementById('pubCheckoutForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        if (!activeCheckoutProduct) return;
+        const file = document.getElementById('chkReceiptFile').files?.[0];
+        if (!file) { showToast('يرجى إرفاق صورة إيصال الدفع أولاً'); return; }
+
+        const btn = document.getElementById('chkSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'جاري إرسال الطلب وإثبات الدفع...';
+
+        try {
+          const { base64, mime } = await compressReceiptFile(file);
+          const priceLabel = Number(activeCheckoutProduct.price) === 0 ? 'مجاني' : ('$' + Number(activeCheckoutProduct.price || 0).toLocaleString('en-US'));
+          const res = await fetch(`${MGD_API_URL}/api/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              productId: activeCheckoutProduct.id,
+              productName: activeCheckoutProduct.name,
+              priceLabel,
+              buyerName: document.getElementById('chkBuyerName').value.trim(),
+              contact: document.getElementById('chkContact').value.trim(),
+              paymentMethod: document.getElementById('chkMethod').value,
+              txRef: document.getElementById('chkTxRef').value.trim(),
+              receiptBase64: base64,
+              receiptMime: mime,
+              receiptName: file.name || 'receipt.jpg',
+              productDownloadUrl: activeCheckoutProduct.downloadUrl || '',
+              productFileName: activeCheckoutProduct.fileName || '',
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.ok) throw new Error(data.error || 'تعذّر إرسال الطلب حالياً');
+
+          const orderInfo = { orderId: data.orderId, accessToken: data.accessToken, productId: activeCheckoutProduct.id };
+          saveOrderLocal(activeCheckoutProduct.id, orderInfo);
+          showToast(`تم إرسال طلبك بنجاح (#${data.orderId})`);
+          showOrderStatusView(orderInfo);
+        } catch (err) {
+          showToast('خطأ: ' + (err.message || 'تعذّر الاتصال بالخادم'));
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'إرسال طلب الشراء وإثبات الدفع';
+        }
+      });
+
       document.getElementById('pubBackBtn').addEventListener('click', () => {
         if (pubHistory.length > 1) {
           pubHistory.pop();
@@ -1486,10 +1781,31 @@
       window.addEventListener('popstate', e => {
         switchPublicPage((e.state && e.state.pubPage) ? e.state.pubPage : 'home', false);
       });
-      document.getElementById('pubSupportForm').addEventListener('submit', e => {
+      document.getElementById('pubSupportForm').addEventListener('submit', async e => {
         e.preventDefault();
-        e.target.reset();
-        showToast('تم استلام طلبك بنجاح! سيتواصل معك فريق MGD قريباً');
+        const btn = e.target.querySelector('button[type="submit"]');
+        const origText = btn ? btn.textContent : '';
+        if (btn) { btn.disabled = true; btn.textContent = 'جاري إرسال الطلب...'; }
+        try {
+          const res = await fetch(`${MGD_API_URL}/api/service-request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('supName').value.trim(),
+              contact: document.getElementById('supContact').value.trim(),
+              topic: document.getElementById('supTopic').value,
+              message: document.getElementById('supMsg').value.trim(),
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.ok) throw new Error(data.error || 'تعذّر إرسال الطلب');
+          e.target.reset();
+          showToast('تم إرسال طلبك للفريق بنجاح! سنتواصل معك قريباً');
+        } catch (err) {
+          showToast('تعذّر الإرسال: ' + (err.message || 'يرجى المحاولة لاحقاً'));
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = origText; }
+        }
       });
     });
   </script>
