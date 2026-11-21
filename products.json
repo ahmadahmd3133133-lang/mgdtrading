@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "tg_mwqqefyr",
+    "name": "MGD Sniper Gold EA",
+    "platform": "MT5",
+    "category": "EA",
+    "price": 555,
+    "status": "جاهز للبيع",
+    "badge": "جديد",
+    "version": "v1.0",
+    "symbol": "XAUUSD",
+    "timeframe": "M5 - H1",
+    "icon": "⚡",
+    "desc": "روبوت سكالبنج ذكي للذهب.",
+    "features": [
+      "فلترة اتجاه",
+      "إدارة مخاطر",
+      "بدون مضاعفات"
+    ]
+  }
+]
