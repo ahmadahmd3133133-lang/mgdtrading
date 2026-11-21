@@ -36,5 +36,25 @@
       "إدارة مخاطر ذكية",
       "دعم فني وتحديثات مستمرة"
     ]
+  },
+  {
+    "id": "tg_mwqs9wuk",
+    "name": "مؤشرتريدنق فيو: سونا",
+    "platform": "MT5",
+    "category": "EA",
+    "price": 30,
+    "status": "جاهز للبيع",
+    "badge": "جديد",
+    "version": "v1.0",
+    "symbol": "XAUUSD",
+    "timeframe": "M5 - H1",
+    "icon": "⚡",
+    "desc": "أداة تداول احترافية من منظومة MGD Trading Technology.",
+    "features": [
+      "متوافق مع MetaTrader",
+      "إدارة مخاطر ذكية",
+      "دعم فني وتحديثات مستمرة"
+    ],
+    "image": "./assets/products/MGD_Product_mwqs9wx8.jpg"
   }
 ]
