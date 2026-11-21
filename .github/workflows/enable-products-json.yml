@@ -1,0 +1,74 @@
+name: Enable Dynamic Products JSON
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-products-json.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add products.json and wire loader in index.html
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          p = Path('products.json')
+          if not p.exists():
+              p.write_text('[]\n', encoding='utf-8')
+          html_path = Path('index.html')
+          html = html_path.read_text(encoding='utf-8').replace('\r\n', '\n')
+          if 'syncProductsFromRepoJson' not in html:
+              pattern = r"    async function syncProductsFromCloud\(\) \{[\s\S]*?document\.addEventListener\('DOMContentLoaded', \(\) => \{\n      syncProductsFromCloud\(\);"
+              new_lines = [
+                  "    function mergeExtraProducts(extraList) {",
+                  "      if (!Array.isArray(extraList) || !extraList.length) return;",
+                  "      const byId = new Map(products.map(p => [p.id, p]));",
+                  "      extraList.forEach(item => {",
+                  "        if (!item || !item.id) return;",
+                  "        if (item.deleted) byId.delete(item.id);",
+                  "        else if (byId.has(item.id)) byId.set(item.id, { ...byId.get(item.id), ...item });",
+                  "        else byId.set(item.id, item);",
+                  "      });",
+                  "      products = Array.from(byId.values());",
+                  "      renderPublicStore();",
+                  "    }",
+                  "",
+                  "    async function syncProductsFromRepoJson() {",
+                  "      try {",
+                  "        const res = await fetch(`./products.json?t=${Date.now()}`, { cache: 'no-store' });",
+                  "        if (!res.ok) return;",
+                  "        const list = await res.json();",
+                  "        mergeExtraProducts(list);",
+                  "      } catch (e) {}",
+                  "    }",
+                  "",
+                  "    async function syncProductsFromCloud() {",
+                  "      try {",
+                  "        const res = await fetch(`${SUPABASE_URL}/rest/v1/mgd_workspace_state?id=eq.main&select=payload`, {",
+                  "          headers: { 'apikey': SUPABASE_KEY }",
+                  "        });",
+                  "        if (!res.ok) return;",
+                  "        const rows = await res.json();",
+                  "        if (rows && rows[0] && rows[0].payload && Array.isArray(rows[0].payload.products)) {",
+                  "          mergeExtraProducts(rows[0].payload.products);",
+                  "        }",
+                  "      } catch (e) {}",
+                  "    }",
+                  "",
+                  "    document.addEventListener('DOMContentLoaded', () => {",
+                  "      syncProductsFromRepoJson();",
+                  "      syncProductsFromCloud();",
+              ]
+              replacement = "\n".join(new_lines)
+              updated, count = re.subn(pattern, lambda m: replacement, html, count=1)
+              assert count == 1, 'Target block not found in index.html'
+              html_path.write_text(updated, encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add products.json index.html
+          git diff --cached --quiet || (git commit -m "Enable dynamic products.json loader" && git push)
