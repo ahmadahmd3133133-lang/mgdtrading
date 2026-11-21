@@ -1,0 +1,42 @@
+name: Enable Vercel API Proxy
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-vercel-proxy.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add vercel.json and use same-origin /api on Vercel
+        run: |
+          python3 -c '
+          from pathlib import Path
+          Path("vercel.json").write_text("""{
+            "rewrites": [
+              {
+                "source": "/api/:path*",
+                "destination": "https://mgd-product-bot.amjdmjd319.workers.dev/api/:path*"
+              }
+            ]
+          }
+          """, encoding="utf-8")
+          p = Path("index.html")
+          html = p.read_text(encoding="utf-8")
+          old1 = "const MGD_API_URL = '\''https://mgd-product-bot.amjdmjd319.workers.dev'\'';"
+          new1 = "const MGD_API_URL = location.hostname.endsWith('\''vercel.app'\'') ? '\'''\'' : '\''https://mgd-product-bot.amjdmjd319.workers.dev'\'';"
+          if old1 in html:
+              html = html.replace(old1, new1, 1)
+          old2 = "dlLink.href = data.downloadReadyUrl;"
+          new2 = "dlLink.href = `${MGD_API_URL}/api/orders/${encodeURIComponent(orderInfo.orderId)}/download?token=${encodeURIComponent(orderInfo.accessToken)}`;"
+          if old2 in html:
+              html = html.replace(old2, new2, 1)
+          p.write_text(html, encoding="utf-8")
+          '
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vercel.json index.html
+          git diff --cached --quiet || (git commit -m "Add Vercel API proxy rewrite so orders and service requests work without VPN" && git push)
