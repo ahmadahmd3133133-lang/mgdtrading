@@ -1358,6 +1358,28 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function mergeExtraProducts(extraList) {
+      if (!Array.isArray(extraList) || !extraList.length) return;
+      const byId = new Map(products.map(p => [p.id, p]));
+      extraList.forEach(item => {
+        if (!item || !item.id) return;
+        if (item.deleted) byId.delete(item.id);
+        else if (byId.has(item.id)) byId.set(item.id, { ...byId.get(item.id), ...item });
+        else byId.set(item.id, item);
+      });
+      products = Array.from(byId.values());
+      renderPublicStore();
+    }
+
+    async function syncProductsFromRepoJson() {
+      try {
+        const res = await fetch(`./products.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const list = await res.json();
+        mergeExtraProducts(list);
+      } catch (e) {}
+    }
+
     async function syncProductsFromCloud() {
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/mgd_workspace_state?id=eq.main&select=payload`, {
@@ -1366,18 +1388,13 @@
         if (!res.ok) return;
         const rows = await res.json();
         if (rows && rows[0] && rows[0].payload && Array.isArray(rows[0].payload.products)) {
-          const cloudMap = new Map(rows[0].payload.products.map(p => [p.id, p]));
-          const merged = MGD_PRODUCTS_CATALOG.map(localP => cloudMap.has(localP.id) ? { ...localP, ...cloudMap.get(localP.id) } : localP);
-          rows[0].payload.products.forEach(cp => {
-            if (!MGD_PRODUCTS_CATALOG.some(lp => lp.id === cp.id)) merged.push(cp);
-          });
-          products = merged;
-          renderPublicStore();
+          mergeExtraProducts(rows[0].payload.products);
         }
       } catch (e) {}
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      syncProductsFromRepoJson();
       syncProductsFromCloud();
       const searchEl = document.getElementById('pubStoreSearch');
       if (searchEl) {
