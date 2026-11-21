@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://mgd-product-bot.amjdmjd319.workers.dev/api/:path*"
+    }
+  ]
+}

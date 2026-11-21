@@ -456,7 +456,7 @@
 
   <div id="pubToast" class="fixed bottom-5 left-5 z-50 hidden px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xl"></div>
   <script>
-    const MGD_API_URL = 'https://mgd-product-bot.amjdmjd319.workers.dev';
+    const MGD_API_URL = location.hostname.endsWith('vercel.app') ? '' : 'https://mgd-product-bot.amjdmjd319.workers.dev';
     const SUPABASE_URL = 'https://htahkllrkireofpvzsma.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_DS2MPbWcUDTOXS9brQx-nA_bmzBrAPK';
     // === MGD_PRODUCTS_CATALOG_START ===
@@ -1641,7 +1641,7 @@
             badge.textContent = '✅ تمت الموافقة على الطلب';
             if (data.downloadReadyUrl) {
               text.textContent = 'تم تأكيد الدفع بنجاح! يمكنك الآن تحميل منتجك مباشرة من الزر أدناه:';
-              dlLink.href = data.downloadReadyUrl;
+              dlLink.href = `${MGD_API_URL}/api/orders/${encodeURIComponent(orderInfo.orderId)}/download?token=${encodeURIComponent(orderInfo.accessToken)}`;
               dlLink.textContent = data.fileName ? `⬇️ تحميل ${data.fileName}` : '⬇️ تحميل المنتج الآن';
               dlBox.classList.remove('hidden');
               stopOrderPolling();
