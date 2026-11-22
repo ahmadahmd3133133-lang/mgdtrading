@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم المتجر | MGD Trading Technology</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#060A13',
+            navy: '#0B1324',
+            navyLight: '#111D35',
+            gold: '#D4AF37',
+            goldBright: '#F3CF67',
+          },
+          fontFamily: { sans: ['Cairo', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { background-color: #060A13; color: #E2E8F0; font-family: 'Cairo', sans-serif; }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #F3CF67 0%, #D4AF37 50%, #B8860B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-card {
+      background: linear-gradient(180deg, rgba(17, 29, 53, 0.88) 0%, rgba(11, 19, 36, 0.96) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+    .input-field {
+      width: 100%;
+      background: rgba(6, 10, 19, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      color: #F8FAFC;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus { border-color: #D4AF37; }
+  </style>
+</head>
+<body class="min-h-screen bg-obsidian text-slate-200">
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-navyLight border border-gold/60 text-goldBright text-xs sm:text-sm font-bold shadow-2xl"></div>
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-20 bg-obsidian/95 backdrop-blur-md border-b border-gold/25">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-amber-700 text-obsidian font-extrabold flex items-center justify-center text-sm shadow-md shadow-gold/25">MGD</div>
+        <div>
+          <div class="text-sm sm:text-base font-extrabold gold-gradient-text leading-tight">لوحة تحكم متجر MGD Trading</div>
+          <div class="text-[11px] text-slate-400">إدارة المنتجات • النشر بالذكاء الاصطناعي • رفع الصور</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="./#store" target="_blank" class="px-3.5 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">عرض المتجر ↗</a>
+        <button id="logoutBtn" type="button" class="hidden px-3.5 py-2 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/25 transition">تسجيل الخروج</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOGIN VIEW -->
+  <main id="loginView" class="max-w-md mx-auto px-4 py-12 sm:py-16">
+    <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-gold/15 border border-gold/40 flex items-center justify-center text-2xl">🔐</div>
+        <h1 class="text-xl font-extrabold gold-gradient-text">تسجيل الدخول للوحة الإدارة</h1>
+        <p class="text-xs text-slate-400 leading-relaxed">اختر طريقة الاتصال المناسبة لشبكتك. المفاتيح تُحفظ محلياً في متصفحك فقط ولا تُرسل لأي طرف ثالث.</p>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-obsidian/80 border border-slate-800">
+        <button type="button" data-auth-mode="worker" class="auth-mode-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition">Cloudflare AI</button>
+        <button type="button" data-auth-mode="github" class="auth-mode-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">GitHub مباشر</button>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div id="workerAuthBox" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">رابط Worker</label>
+            <input id="loginWorkerUrl" type="url" class="input-field font-mono text-xs" value="https://mgd-product-bot.amjdmjd319.workers.dev" dir="ltr" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">كلمة مرور الإدارة (ADMIN_SECRET)</label>
+            <input id="loginAdminSecret" type="password" class="input-field" placeholder="أدخل ADMIN_SECRET" dir="ltr" />
+          </div>
+          <p class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl p-2.5 leading-relaxed">
+            يدعم النشر بالنص الحر عبر الذكاء الاصطناعي. إذا كانت شبكتك تحجب <code class="font-mono">workers.dev</code> بدون VPN، اختر تبويب <strong>GitHub مباشر</strong> بالأعلى.
+          </p>
+        </div>
+
+        <div id="githubAuthBox" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">مفتاح GitHub (GITHUB_TOKEN)</label>
+            <input id="loginGithubToken" type="password" class="input-field" placeholder="github_pat_..." dir="ltr" />
+          </div>
+          <p class="text-[11px] text-emerald-300/90 bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-2.5 leading-relaxed">
+            يتصل مباشرة بمستودع <code class="font-mono">ahmadahmd3133133-lang/mgdtrading</code> ويعمل بسرعة عالية حتى بدون VPN!
+          </p>
+        </div>
+
+        <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+          <input id="rememberMe" type="checkbox" checked class="accent-gold w-4 h-4 rounded" />
+          <span>تذكر تسجيل الدخول على هذا الجهاز</span>
+        </label>
+
+        <div id="loginError" class="hidden text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 leading-relaxed"></div>
+
+        <button id="loginSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-gold/20">
+          دخول إلى لوحة التحكم
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- DASHBOARD VIEW -->
+  <main id="dashboardView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- Top Stats Bar -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="glass-card rounded-2xl p-4">
+        <div class="text-[11px] text-slate-400">حالة الاتصال</div>
+        <div id="statMode" class="text-sm font-extrabold text-emerald-400 mt-1">متصل</div>
+      </div>
+      <div class="glass-card rounded-2xl p-4">
+        <div class="text-[11px] text-slate-400">المنتجات الديناميكية (products.json)</div>
+        <div id="statCount" class="text-xl font-extrabold text-goldBright font-mono mt-0.5">0</div>
+      </div>
+      <div class="glass-card rounded-2xl p-4">
+        <div class="text-[11px] text-slate-400">وقت التحديث على الموقع</div>
+        <div class="text-sm font-extrabold text-white mt-1">~15 – 25 ثانية</div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-2">
+        <div>
+          <div class="text-[11px] text-slate-400">مزامنة القائمة</div>
+          <div class="text-xs text-slate-300 mt-1">تحديث فوري من المستودع</div>
+        </div>
+        <button id="refreshBtn" type="button" class="px-3 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/15 transition">↻ تحديث</button>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- LEFT/TOP: Add / Edit Product Panel -->
+      <section class="lg:col-span-5 glass-card rounded-3xl p-5 sm:p-6 space-y-5">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="formHeading" class="text-base font-extrabold gold-gradient-text">إضافة منتج جديد</h2>
+          <button id="resetFormBtn" type="button" class="hidden text-xs text-slate-400 hover:text-goldBright">✕ إلغاء التعديل</button>
+        </div>
+
+        <!-- Tabs: AI Prompt vs Full Form -->
+        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-obsidian/80 border border-slate-800">
+          <button type="button" data-editor-tab="form" class="editor-tab-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition">📝 النموذج الكامل</button>
+          <button type="button" data-editor-tab="ai" class="editor-tab-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">🤖 نشر بالذكاء الاصطناعي</button>
+        </div>
+
+        <!-- AI Quick Publish Form -->
+        <form id="aiPublishForm" class="hidden space-y-4">
+          <div id="aiNoticeBox" class="text-[11px] text-slate-300 bg-navyLight/70 border border-gold/20 rounded-xl p-3 leading-relaxed">
+            اكتب وصف المنتج بحرية (عربي أو إنجليزي)، وسيقوم <strong>Cloudflare Workers AI</strong> تلقائياً باستخراج الاسم، المنصة، الفئة، السعر، الخصم، والمميزات ونشره فوراً!
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">وصف المنتج الحر</label>
+            <textarea id="aiPrompt" rows="4" class="input-field" placeholder="مثال: انشر مؤشر سونا لتريدنق فيو بسعر 30 دولار بدل 60 دولار للذهب فريم 5 دقائق يعطي إشارات شراء وبيع دقيقة بدون إعادة رسم"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">صورة المنتج (اختياري)</label>
+            <input id="aiImageInput" type="file" accept="image/*" class="input-field text-xs" />
+            <img id="aiImagePreview" class="hidden mt-2 w-20 h-20 rounded-xl object-cover border border-gold/40" alt="معاينة" />
+          </div>
+          <button id="aiSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs sm:text-sm font-extrabold hover:opacity-95 transition">
+            🤖 تحليل ونشر المنتج بالذكاء الاصطناعي
+          </button>
+        </form>
+
+        <!-- Structured Product Form -->
+        <form id="productForm" class="space-y-3.5">
+          <input type="hidden" id="fId" />
+          <input type="hidden" id="fExistingImage" />
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">اسم المنتج *</label>
+            <input id="fName" type="text" required class="input-field" placeholder="مثال: MGD Sniper Gold EA" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">السعر ($) *</label>
+              <input id="fPrice" type="number" min="0" step="any" required class="input-field font-mono" placeholder="149" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">السعر القديم ($) (اختياري)</label>
+              <input id="fOldPrice" type="number" min="0" step="any" class="input-field font-mono" placeholder="299" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">المنصة</label>
+              <select id="fPlatform" class="input-field">
+                <option value="MT5">MT5</option>
+                <option value="MT4">MT4</option>
+                <option value="TradingView">TradingView</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الفئة</label>
+              <select id="fCategory" class="input-field">
+                <option value="EA">EA (روبوت تداول)</option>
+                <option value="مؤشر">مؤشر</option>
+                <option value="أداة">أداة / لوحة تحكم</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الشارة</label>
+              <input id="fBadge" type="text" class="input-field text-xs" placeholder="جديد / خصم 50%" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الحالة</label>
+              <select id="fStatus" class="input-field text-xs">
+                <option value="جاهز للبيع">جاهز للبيع</option>
+                <option value="قيد التطوير">قيد التطوير</option>
+                <option value="قريباً">قريباً</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الإصدار</label>
+              <input id="fVersion" type="text" class="input-field text-xs font-mono" value="v1.0" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الأسواق / الرمز</label>
+              <input id="fSymbol" type="text" class="input-field text-xs" value="XAUUSD" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">الفريم الزمني</label>
+              <input id="fTimeframe" type="text" class="input-field text-xs" value="M5 - H1" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">الوصف *</label>
+            <textarea id="fDesc" rows="3" required class="input-field" placeholder="وصف احترافي مختصر للمنتج..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">المميزات (كل ميزة في سطر منفصل)</label>
+            <textarea id="fFeatures" rows="3" class="input-field" placeholder="فلترة اتجاه تلقائية&#10;وقف خسارة ديناميكي&#10;بدون مضاعفات"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">اسم الملف (اختياري)</label>
+              <input id="fFileName" type="text" class="input-field text-xs font-mono" placeholder="MGD_Bot.ex5" dir="ltr" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">رابط التحميل (اختياري)</label>
+              <input id="fDownloadUrl" type="url" class="input-field text-xs font-mono" placeholder="https://..." dir="ltr" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">صورة المنتج (PNG / JPG)</label>
+            <input id="fImageInput" type="file" accept="image/*" class="input-field text-xs" />
+            <div id="fImagePreviewWrap" class="hidden mt-2 flex items-center gap-3">
+              <img id="fImagePreview" class="w-16 h-16 rounded-xl object-cover border border-gold/40" alt="معاينة الصورة" />
+              <span id="fImageName" class="text-[11px] text-slate-400 font-mono"></span>
+            </div>
+          </div>
+
+          <button id="saveProductBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-gold/20">
+            💾 حفظ ونشر المنتج على الموقع
+          </button>
+        </form>
+      </section>
+
+      <!-- RIGHT: Products List -->
+      <section class="lg:col-span-7 glass-card rounded-3xl p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-extrabold text-white">المنتجات المضافة (البوت + لوحة التحكم)</h2>
+            <p class="text-[11px] text-slate-400">اضغط <strong>تعديل</strong> لتصحيح أي منتج أو <strong>حذف</strong> لإزالته من المتجر فوراً.</p>
+          </div>
+          <input id="searchInput" type="text" class="input-field sm:w-56 text-xs" placeholder="🔍 بحث بالاسم أو المعرّف..." />
+        </div>
+
+        <div id="productsList" class="space-y-3">
+          <div class="text-center py-10 text-xs text-slate-400">جاري تحميل المنتجات...</div>
+        </div>
+
+        <!-- Hide built-in catalog item -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <details class="text-xs text-slate-400">
+            <summary class="cursor-pointer font-bold text-slate-300 hover:text-goldBright">إخفاء منتج من الكتالوج الأساسي (p1 – p44)</summary>
+            <div class="mt-3 flex gap-2">
+              <input id="hideCatalogId" type="text" class="input-field text-xs font-mono" placeholder="أدخل المعرّف مثل p2" dir="ltr" />
+              <button id="hideCatalogBtn" type="button" class="px-4 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold hover:bg-rose-500/30 shrink-0">إخفاء</button>
+            </div>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const GH_OWNER = 'ahmadahmd3133133-lang';
+    const GH_REPO = 'mgdtrading';
+    const GH_BRANCH = 'main';
+    const STORAGE_KEY = 'mgd_admin_session_v1';
+
+    let session = null;
+    let productsCache = [];
+    let selectedImageB64 = null;
+    let selectedImageExt = 'png';
+    let aiImageB64 = null;
+    let aiImageExt = 'png';
+    let currentAuthMode = 'worker';
+
+    const $ = id => document.getElementById(id);
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function showToast(msg, isError = false) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.className = `fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold shadow-2xl border ${
+        isError ? 'bg-rose-950/95 border-rose-500/60 text-rose-200' : 'bg-navyLight/95 border-gold/60 text-goldBright'
+      }`;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    function slugify(text) {
+      const clean = String(text || 'product').trim().replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+      return (clean || 'MGD_Product') + '_' + Date.now().toString(36);
+    }
+
+    function utf8ToB64(str) {
+      const bytes = new TextEncoder().encode(str);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+      return btoa(bin);
+    }
+
+    function b64ToUtf8(b64) {
+      const bin = atob(String(b64 || '').replace(/\s+/g, ''));
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = String(reader.result || '');
+          const b64 = dataUrl.replace(/^data:[^;]+;base64,/, '');
+          const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+          resolve({ b64, ext, dataUrl });
+        };
+        reader.onerror = () => reject(new Error('فشل قراءة الصورة'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function ghFetch(path, options = {}) {
+      const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
+      return fetch(url, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${session.githubToken}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          ...(options.headers || {}),
+        },
+      });
+    }
+
+    async function ghLoadProducts() {
+      const res = await ghFetch(`products.json?ref=${GH_BRANCH}&t=${Date.now()}`);
+      if (res.status === 404) return { items: [], sha: null };
+      if (!res.ok) throw new Error(`خطأ GitHub (${res.status}) — تأكد من صحة المفتاح وصلاحية Contents`);
+      const data = await res.json();
+      const parsed = JSON.parse(b64ToUtf8(data.content || 'W10='));
+      return { items: Array.isArray(parsed) ? parsed : [], sha: data.sha };
+    }
+
+    async function ghSaveProducts(items, sha, message) {
+      const body = {
+        message,
+        content: utf8ToB64(JSON.stringify(items, null, 2) + '\n'),
+        branch: GH_BRANCH,
+        ...(sha ? { sha } : {}),
+      };
+      const res = await ghFetch('products.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`فشل الحفظ في GitHub (${res.status})`);
+      return res.json();
+    }
+
+    async function ghUploadImage(name, b64, ext) {
+      const fileName = `${slugify(name)}.${ext}`;
+      const rel = `assets/products/${fileName}`;
+      const res = await ghFetch(rel, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `Upload ${fileName}`, content: b64, branch: GH_BRANCH }),
+      });
+      if (!res.ok) throw new Error(`فشل رفع الصورة إلى GitHub (${res.status})`);
+      return `./${rel}`;
+    }
+
+    async function apiListProducts() {
+      if (session.mode === 'worker') {
+        const res = await fetch(`${session.workerUrl}/api/products`, {
+          headers: { 'Authorization': `Bearer ${session.adminSecret}` },
+        });
+        if (res.status === 401) throw new Error('كلمة مرور الإدارة (ADMIN_SECRET) غير صحيحة.');
+        if (!res.ok) throw new Error(`خطأ من الخادم (${res.status})`);
+        const data = await res.json();
+        return Array.isArray(data.products) ? data.products : [];
+      } else {
+        const { items } = await ghLoadProducts();
+        return items;
+      }
+    }
+
+    async function apiSaveProduct(payload) {
+      if (session.mode === 'worker') {
+        const res = await fetch(`${session.workerUrl}/api/products`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.adminSecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `خطأ من الخادم (${res.status})`);
+        return data.product;
+      } else {
+        const { items, sha } = await ghLoadProducts();
+        const product = { ...payload };
+        delete product.imageBase64;
+        delete product.imageExt;
+        if (!product.id) product.id = 'web_' + Date.now().toString(36);
+        if (payload.imageBase64) {
+          product.image = await ghUploadImage(product.name, payload.imageBase64, payload.imageExt || 'png');
+        }
+        const idx = items.findIndex(p => p.id === product.id);
+        if (idx >= 0) items[idx] = { ...items[idx], ...product };
+        else items.push(product);
+        await ghSaveProducts(items, sha, `Update product via Admin Panel: ${product.name}`);
+        return product;
+      }
+    }
+
+    async function apiDeleteProduct(id) {
+      if (session.mode === 'worker') {
+        const res = await fetch(`${session.workerUrl}/api/products/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${session.adminSecret}` },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `فشل الحذف (${res.status})`);
+        return true;
+      } else {
+        const { items, sha } = await ghLoadProducts();
+        const filtered = items.filter(p => p.id !== id);
+        if (filtered.length === items.length) filtered.push({ id, deleted: true });
+        await ghSaveProducts(filtered, sha, `Delete product via Admin Panel: ${id}`);
+        return true;
+      }
+    }
+
+    function renderProducts() {
+      const q = ($('searchInput').value || '').trim().toLowerCase();
+      const active = productsCache.filter(p => !p.deleted);
+      const hidden = productsCache.filter(p => p.deleted);
+      $('statCount').textContent = active.length;
+
+      const filtered = active.filter(p => !q || `${p.name} ${p.id} ${p.platform} ${p.category} ${p.desc}`.toLowerCase().includes(q));
+      const box = $('productsList');
+
+      if (!filtered.length) {
+        box.innerHTML = `<div class="text-center py-10 rounded-2xl bg-obsidian/60 border border-slate-800 text-xs text-slate-400">
+          ${active.length ? 'لا توجد نتائج مطابقة للبحث.' : 'لا توجد منتجات مضافة في products.json بعد.'}
+        </div>`;
+      } else {
+        box.innerHTML = filtered.map(p => `
+          <div class="p-4 rounded-2xl bg-obsidian/70 border border-slate-800 hover:border-gold/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="w-14 h-14 rounded-xl bg-navyLight border border-gold/30 flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                ${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" class="w-full h-full object-cover" onerror="this.remove()">` : esc(p.icon || '⚡')}
+              </div>
+              <div class="min-w-0 space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <h3 class="text-sm font-extrabold text-white truncate">${esc(p.name)}</h3>
+                  <span class="px-2 py-0.5 rounded bg-navyLight border border-gold/30 text-goldBright text-[10px] font-mono font-bold">${esc(p.platform || 'MT5')}</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">${esc(p.category || 'EA')}</span>
+                  ${p.badge ? `<span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px] font-bold">${esc(p.badge)}</span>` : ''}
+                </div>
+                <p class="text-xs text-slate-400 line-clamp-2">${esc(p.desc || '')}</p>
+                <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 font-mono">
+                  <span class="text-goldBright font-extrabold">$${Number(p.price || 0).toLocaleString('en-US')}${p.oldPrice ? ` <span class="line-through text-slate-500 font-normal">$${Number(p.oldPrice).toLocaleString('en-US')}</span>` : ''}</span>
+                  <span>ID: ${esc(p.id)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex sm:flex-col gap-2 shrink-0">
+              <button type="button" data-edit-id="${esc(p.id)}" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-gold/15 border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/25 transition">✏️ تعديل</button>
+              <button type="button" data-delete-id="${esc(p.id)}" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/25 transition">🗑️ حذف</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (hidden.length) {
+        box.innerHTML += `<div class="pt-3 text-[11px] text-slate-500">منتجات كتالوج مخفية: ${hidden.map(h => `<code class="px-1.5 py-0.5 rounded bg-slate-900 text-slate-300 font-mono">${esc(h.id)}</code>`).join(' ')}</div>`;
+      }
+    }
+
+    function resetProductForm() {
+      $('productForm').reset();
+      $('fId').value = '';
+      $('fExistingImage').value = '';
+      $('fVersion').value = 'v1.0';
+      $('fSymbol').value = 'XAUUSD';
+      $('fTimeframe').value = 'M5 - H1';
+      selectedImageB64 = null;
+      $('fImagePreviewWrap').classList.add('hidden');
+      $('formHeading').textContent = 'إضافة منتج جديد';
+      $('saveProductBtn').textContent = '💾 حفظ ونشر المنتج على الموقع';
+      $('resetFormBtn').classList.add('hidden');
+    }
+
+    function startEditProduct(p) {
+      switchEditorTab('form');
+      $('fId').value = p.id || '';
+      $('fName').value = p.name || '';
+      $('fPrice').value = p.price ?? 0;
+      $('fOldPrice').value = p.oldPrice || '';
+      $('fPlatform').value = ['MT5', 'MT4', 'TradingView'].includes(p.platform) ? p.platform : 'MT5';
+      $('fCategory').value = ['EA', 'مؤشر', 'أداة'].includes(p.category) ? p.category : 'EA';
+      $('fBadge').value = p.badge || '';
+      $('fStatus').value = p.status || 'جاهز للبيع';
+      $('fVersion').value = p.version || 'v1.0';
+      $('fSymbol').value = p.symbol || 'XAUUSD';
+      $('fTimeframe').value = p.timeframe || 'M5 - H1';
+      $('fDesc').value = p.desc || '';
+      $('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
+      $('fFileName').value = p.fileName || '';
+      $('fDownloadUrl').value = p.downloadUrl || '';
+      $('fExistingImage').value = p.image || '';
+      selectedImageB64 = null;
+
+      if (p.image) {
+        $('fImagePreview').src = p.image;
+        $('fImageName').textContent = p.image;
+        $('fImagePreviewWrap').classList.remove('hidden');
+      } else {
+        $('fImagePreviewWrap').classList.add('hidden');
+      }
+
+      $('formHeading').textContent = `تعديل المنتج (${p.id})`;
+      $('saveProductBtn').textContent = '✅ حفظ التعديلات وتحديث الموقع';
+      $('resetFormBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchEditorTab(tab) {
+      document.querySelectorAll('.editor-tab-btn').forEach(btn => {
+        const active = btn.dataset.editorTab === tab;
+        btn.className = active
+          ? 'editor-tab-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition'
+          : 'editor-tab-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
+      });
+      $('productForm').classList.toggle('hidden', tab !== 'form');
+      $('aiPublishForm').classList.toggle('hidden', tab !== 'ai');
+      if (tab === 'ai' && session?.mode !== 'worker') {
+        $('aiNoticeBox').innerHTML = '⚠️ ميزة النشر بالنص الحر عبر <strong>Workers AI</strong> تتطلب تسجيل الدخول بوضع <strong>Cloudflare AI (ADMIN_SECRET)</strong>. يمكنك استخدام <strong>النموذج الكامل</strong> هنا بوضع GitHub مباشر بدون VPN.';
+      }
+    }
+
+    async function loadDashboard() {
+      $('loginView').classList.add('hidden');
+      $('dashboardView').classList.remove('hidden');
+      $('logoutBtn').classList.remove('hidden');
+      $('statMode').textContent = session.mode === 'worker' ? 'Cloudflare Worker AI ✓' : 'GitHub مباشر (بدون VPN) ✓';
+      try {
+        productsCache = await apiListProducts();
+        renderProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    document.querySelectorAll('.auth-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentAuthMode = btn.dataset.authMode;
+        document.querySelectorAll('.auth-mode-btn').forEach(b => {
+          const on = b.dataset.authMode === currentAuthMode;
+          b.className = on
+            ? 'auth-mode-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition'
+            : 'auth-mode-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
+        });
+        $('workerAuthBox').classList.toggle('hidden', currentAuthMode !== 'worker');
+        $('githubAuthBox').classList.toggle('hidden', currentAuthMode !== 'github');
+        $('loginError').classList.add('hidden');
+      });
+    });
+
+    document.querySelectorAll('.editor-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchEditorTab(btn.dataset.editorTab));
+    });
+
+    $('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const errBox = $('loginError');
+      errBox.classList.add('hidden');
+      const btn = $('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'جاري التحقق من الاتصال...';
+
+      try {
+        if (currentAuthMode === 'worker') {
+          const workerUrl = $('loginWorkerUrl').value.trim().replace(/\/+$/, '');
+          const adminSecret = $('loginAdminSecret').value.trim();
+          if (!adminSecret) throw new Error('أدخل كلمة مرور الإدارة ADMIN_SECRET.');
+          session = { mode: 'worker', workerUrl, adminSecret };
+        } else {
+          const githubToken = $('loginGithubToken').value.trim();
+          if (!githubToken) throw new Error('أدخل مفتاح GitHub (GITHUB_TOKEN).');
+          session = { mode: 'github', githubToken };
+        }
+
+        productsCache = await apiListProducts();
+        const store = $('rememberMe').checked ? localStorage : sessionStorage;
+        store.setItem(STORAGE_KEY, JSON.stringify(session));
+        await loadDashboard();
+        showToast('تم تسجيل الدخول بنجاح!');
+      } catch (err) {
+        session = null;
+        let msg = err.message || 'فشل الاتصال';
+        if (msg.includes('Failed to fetch') && currentAuthMode === 'worker') {
+          msg = 'تعذّر الوصول إلى Cloudflare Worker من شبكتك الحالية (قد يتطلب VPN). جرّب التبديل إلى تبويب "GitHub مباشر" بالأعلى ليعمل فوراً بدون VPN!';
+        }
+        errBox.textContent = msg;
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'دخول إلى لوحة التحكم';
+      }
+    });
+
+    $('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY);
+      session = null;
+      $('dashboardView').classList.add('hidden');
+      $('logoutBtn').classList.add('hidden');
+      $('loginView').classList.remove('hidden');
+      showToast('تم تسجيل الخروج.');
+    });
+
+    $('refreshBtn').addEventListener('click', async () => {
+      try {
+        productsCache = await apiListProducts();
+        renderProducts();
+        showToast('تم تحديث القائمة بنجاح.');
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    $('searchInput').addEventListener('input', renderProducts);
+    $('resetFormBtn').addEventListener('click', resetProductForm);
+
+    $('fImageInput').addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const { b64, ext, dataUrl } = await fileToBase64(file);
+      selectedImageB64 = b64;
+      selectedImageExt = ext;
+      $('fImagePreview').src = dataUrl;
+      $('fImageName').textContent = file.name;
+      $('fImagePreviewWrap').classList.remove('hidden');
+    });
+
+    $('aiImageInput').addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const { b64, ext, dataUrl } = await fileToBase64(file);
+      aiImageB64 = b64;
+      aiImageExt = ext;
+      $('aiImagePreview').src = dataUrl;
+      $('aiImagePreview').classList.remove('hidden');
+    });
+
+    $('productForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = $('saveProductBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ جاري الحفظ والنشر...';
+
+      try {
+        const price = Number($('fPrice').value || 0);
+        const oldPrice = $('fOldPrice').value ? Number($('fOldPrice').value) : undefined;
+        let badge = $('fBadge').value.trim();
+        if (!badge && oldPrice && oldPrice > price && price > 0) {
+          badge = `خصم ${Math.round(((oldPrice - price) / oldPrice) * 100)}%`;
+        } else if (!badge) {
+          badge = price === 0 ? 'مجاني' : 'جديد';
+        }
+        const features = $('fFeatures').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+        const category = $('fCategory').value;
+        const payload = {
+          ...( $('fId').value ? { id: $('fId').value } : {} ),
+          name: $('fName').value.trim(),
+          price,
+          ...(oldPrice && oldPrice > price ? { oldPrice } : {}),
+          platform: $('fPlatform').value,
+          category,
+          badge,
+          status: $('fStatus').value,
+          version: $('fVersion').value.trim() || 'v1.0',
+          symbol: $('fSymbol').value.trim() || 'XAUUSD',
+          timeframe: $('fTimeframe').value.trim() || 'M5 - H1',
+          icon: category === 'مؤشر' ? '📊' : '⚡',
+          desc: $('fDesc').value.trim(),
+          features: features.length ? features : [`متوافق بالكامل مع ${$('fPlatform').value}`, 'إدارة مخاطر ذكية', 'دعم فني وتحديثات مستمرة'],
+          ...( $('fFileName').value.trim() ? { fileName: $('fFileName').value.trim() } : {} ),
+          ...( $('fDownloadUrl').value.trim() ? { downloadUrl: $('fDownloadUrl').value.trim() } : {} ),
+          ...( $('fExistingImage').value && !selectedImageB64 ? { image: $('fExistingImage').value } : {} ),
+          ...( selectedImageB64 ? { imageBase64: selectedImageB64, imageExt: selectedImageExt } : {} ),
+        };
+
+        await apiSaveProduct(payload);
+        resetProductForm();
+        productsCache = await apiListProducts();
+        renderProducts();
+        showToast('✅ تم حفظ ونشر المنتج! سيظهر على المتجر خلال ~20 ثانية.');
+      } catch (err) {
+        showToast(err.message, true);
+      } finally {
+        btn.disabled = false;
+        if (!$('fId').value) btn.textContent = '💾 حفظ ونشر المنتج على الموقع';
+      }
+    });
+
+    $('aiPublishForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (session?.mode !== 'worker') {
+        showToast('النشر بالنص الحر عبر الذكاء الاصطناعي يعمل عند الدخول بوضع Cloudflare AI (ADMIN_SECRET).', true);
+        return;
+      }
+      const prompt = $('aiPrompt').value.trim();
+      if (!prompt) { showToast('اكتب وصف المنتج أولاً.', true); return; }
+      const btn = $('aiSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = '🤖 جاري التحليل والنشر بالذكاء الاصطناعي...';
+
+      try {
+        await apiSaveProduct({
+          prompt,
+          ...(aiImageB64 ? { imageBase64: aiImageB64, imageExt: aiImageExt } : {}),
+        });
+        $('aiPublishForm').reset();
+        aiImageB64 = null;
+        $('aiImagePreview').classList.add('hidden');
+        productsCache = await apiListProducts();
+        renderProducts();
+        showToast('🤖 تم التحليل بالذكاء الاصطناعي ونشر المنتج بنجاح!');
+      } catch (err) {
+        showToast(err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🤖 تحليل ونشر المنتج بالذكاء الاصطناعي';
+      }
+    });
+
+    $('productsList').addEventListener('click', async e => {
+      const editBtn = e.target.closest('[data-edit-id]');
+      if (editBtn) {
+        const p = productsCache.find(x => x.id === editBtn.dataset.editId);
+        if (p) startEditProduct(p);
+        return;
+      }
+      const delBtn = e.target.closest('[data-delete-id]');
+      if (delBtn) {
+        const id = delBtn.dataset.deleteId;
+        if (!confirm(`هل أنت متأكد من حذف المنتج (${id}) من المتجر؟`)) return;
+        delBtn.disabled = true;
+        delBtn.textContent = '...';
+        try {
+          await apiDeleteProduct(id);
+          productsCache = await apiListProducts();
+          renderProducts();
+          showToast(`🗑️ تم حذف المنتج (${id}) بنجاح.`);
+        } catch (err) {
+          showToast(err.message, true);
+          delBtn.disabled = false;
+          delBtn.textContent = '🗑️ حذف';
+        }
+      }
+    });
+
+    $('hideCatalogBtn').addEventListener('click', async () => {
+      const id = $('hideCatalogId').value.trim();
+      if (!id) return;
+      if (!confirm(`إخفاء المنتج (${id}) من الكتالوج الأساسي في المتجر؟`)) return;
+      try {
+        await apiDeleteProduct(id);
+        $('hideCatalogId').value = '';
+        productsCache = await apiListProducts();
+        renderProducts();
+        showToast(`تم إخفاء المنتج (${id}) بنجاح.`);
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    (function init() {
+      const saved = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          session = JSON.parse(saved);
+          loadDashboard();
+        } catch {
+          localStorage.removeItem(STORAGE_KEY);
+          sessionStorage.removeItem(STORAGE_KEY);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
