@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة تحكم المتجر | MGD Trading Technology</title>
+  <title>MGD ADMIN CONTROL CENTER | لوحة التحكم المركزية</title>
   <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,311 +33,685 @@
       -webkit-text-fill-color: transparent;
     }
     .glass-card {
-      background: linear-gradient(180deg, rgba(17, 29, 53, 0.88) 0%, rgba(11, 19, 36, 0.96) 100%);
+      background: linear-gradient(180deg, rgba(17, 29, 53, 0.9) 0%, rgba(11, 19, 36, 0.97) 100%);
       border: 1px solid rgba(212, 175, 55, 0.22);
       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
     }
     .input-field {
       width: 100%;
-      background: rgba(6, 10, 19, 0.85);
+      background: rgba(6, 10, 19, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.25);
       border-radius: 0.75rem;
-      padding: 0.65rem 0.9rem;
+      padding: 0.6rem 0.85rem;
       color: #F8FAFC;
-      font-size: 0.875rem;
+      font-size: 0.825rem;
       outline: none;
       transition: border-color 0.2s;
     }
     .input-field:focus { border-color: #D4AF37; }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.05));
+      border-color: rgba(212, 175, 55, 0.6);
+      color: #F3CF67;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-obsidian text-slate-200">
-  <!-- Toast -->
+<body class="min-h-screen bg-obsidian text-slate-200 flex flex-col">
+  <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-navyLight border border-gold/60 text-goldBright text-xs sm:text-sm font-bold shadow-2xl"></div>
 
-  <!-- Top Header -->
-  <header class="sticky top-0 z-20 bg-obsidian/95 backdrop-blur-md border-b border-gold/25">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-md border-b border-gold/25">
+    <div class="max-w-[1600px] mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
+        <button id="mobileMenuBtn" type="button" class="lg:hidden px-2.5 py-1.5 rounded-lg bg-navyLight border border-gold/30 text-goldBright text-sm">☰</button>
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-amber-700 text-obsidian font-extrabold flex items-center justify-center text-sm shadow-md shadow-gold/25">MGD</div>
         <div>
-          <div class="text-sm sm:text-base font-extrabold gold-gradient-text leading-tight">لوحة تحكم متجر MGD Trading</div>
-          <div class="text-[11px] text-slate-400">إدارة المنتجات • النشر بالذكاء الاصطناعي • رفع الصور</div>
+          <div class="text-sm sm:text-base font-extrabold gold-gradient-text leading-tight">MGD ADMIN CONTROL CENTER</div>
+          <div id="headerUserSubtitle" class="text-[11px] text-slate-400">منصة الإدارة المركزية وبوابة الموظفين</div>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="./#store" target="_blank" class="px-3.5 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">عرض المتجر ↗</a>
-        <button id="logoutBtn" type="button" class="hidden px-3.5 py-2 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/25 transition">تسجيل الخروج</button>
+        <button id="langToggleBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-navyLight border border-slate-700 text-slate-300 text-xs font-bold hover:border-gold/50">EN / عربي</button>
+        <a href="./#store" target="_blank" class="px-3 py-1.5 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">الموقع العام ↗</a>
+        <button id="logoutBtn" type="button" class="hidden px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/25 transition">خروج</button>
       </div>
     </div>
   </header>
 
-  <!-- LOGIN VIEW -->
-  <main id="loginView" class="max-w-md mx-auto px-4 py-12 sm:py-16">
-    <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+  <!-- LOGIN VIEW (Unified Admin & Staff Portal Gate) -->
+  <main id="loginView" class="flex-1 flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md glass-card rounded-3xl p-6 sm:p-8 space-y-6">
       <div class="text-center space-y-2">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-gold/15 border border-gold/40 flex items-center justify-center text-2xl">🔐</div>
-        <h1 class="text-xl font-extrabold gold-gradient-text">تسجيل الدخول للوحة الإدارة</h1>
-        <p class="text-xs text-slate-400 leading-relaxed">اختر طريقة الاتصال المناسبة لشبكتك. المفاتيح تُحفظ محلياً في متصفحك فقط ولا تُرسل لأي طرف ثالث.</p>
-      </div>
-
-      <!-- Mode Switcher -->
-      <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-obsidian/80 border border-slate-800">
-        <button type="button" data-auth-mode="worker" class="auth-mode-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition">Cloudflare AI</button>
-        <button type="button" data-auth-mode="github" class="auth-mode-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">GitHub مباشر</button>
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-gold/15 border border-gold/40 flex items-center justify-center text-2xl">🛡️</div>
+        <h1 class="text-xl font-extrabold gold-gradient-text">بوابة الدخول الموحّدة — MGD</h1>
+        <p class="text-xs text-slate-400">دخول المدير الرئيسي وبوابة الموظفين وفق الصلاحيات المعتمدة</p>
       </div>
 
       <form id="loginForm" class="space-y-4">
-        <div id="workerAuthBox" class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">رابط Worker</label>
-            <input id="loginWorkerUrl" type="url" class="input-field font-mono text-xs" value="https://mgdtrading.vercel.app" dir="ltr" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">كلمة مرور الإدارة (ADMIN_SECRET)</label>
-            <input id="loginAdminSecret" type="password" class="input-field" placeholder="أدخل ADMIN_SECRET" dir="ltr" />
-          </div>
-          <p class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl p-2.5 leading-relaxed">
-            يدعم النشر بالنص الحر عبر الذكاء الاصطناعي. يعمل مباشرة عبر بروكسي Vercel السريع بدون الحاجة لـ VPN!
-          </p>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">البريد الإلكتروني (للمدير أو الموظف)</label>
+          <input id="loginEmail" type="email" required class="input-field" value="aaamjd333g@gmail.com" placeholder="name@mgdtrading.com" dir="ltr" />
         </div>
-
-        <div id="githubAuthBox" class="hidden space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">مفتاح GitHub (GITHUB_TOKEN)</label>
-            <input id="loginGithubToken" type="password" class="input-field" placeholder="github_pat_..." dir="ltr" />
-          </div>
-          <p class="text-[11px] text-emerald-300/90 bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-2.5 leading-relaxed">
-            يتصل مباشرة بمستودع <code class="font-mono">ahmadahmd3133133-lang/mgdtrading</code> ويعمل بسرعة عالية حتى بدون VPN!
-          </p>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">كلمة المرور</label>
+          <input id="loginPassword" type="password" required class="input-field" placeholder="••••••••••••" dir="ltr" />
         </div>
-
+        <details class="text-[11px] text-slate-400">
+          <summary class="cursor-pointer hover:text-goldBright">إعدادات خادم الـ API المتقدمة</summary>
+          <input id="loginWorkerUrl" type="url" class="input-field font-mono text-xs mt-2" value="https://mgdtrading.vercel.app" dir="ltr" />
+        </details>
         <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
           <input id="rememberMe" type="checkbox" checked class="accent-gold w-4 h-4 rounded" />
-          <span>تذكر تسجيل الدخول على هذا الجهاز</span>
+          <span>تذكر الجلسة على هذا الجهاز</span>
         </label>
-
-        <div id="loginError" class="hidden text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 leading-relaxed"></div>
-
+        <div id="loginError" class="hidden text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3"></div>
         <button id="loginSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-gold/20">
-          دخول إلى لوحة التحكم
+          تسجيل الدخول الآمن
         </button>
       </form>
     </div>
   </main>
 
-  <!-- DASHBOARD VIEW -->
-  <main id="dashboardView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-    <!-- Top Stats Bar -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <div class="glass-card rounded-2xl p-4">
-        <div class="text-[11px] text-slate-400">حالة الاتصال</div>
-        <div id="statMode" class="text-sm font-extrabold text-emerald-400 mt-1">متصل</div>
+  <!-- CONTROL CENTER SHELL -->
+  <div id="appShell" class="hidden flex-1 max-w-[1600px] w-full mx-auto flex">
+    <!-- Collapsible Department Sidebar -->
+    <aside id="sidebar" class="w-64 shrink-0 bg-navy/90 border-l border-gold/20 p-3 space-y-1.5 hidden lg:block">
+      <div class="px-3 py-2 mb-2 rounded-xl bg-obsidian/70 border border-gold/20">
+        <div id="userBadgeName" class="text-xs font-extrabold text-goldBright truncate">المدير الرئيسي</div>
+        <div id="userBadgeRole" class="text-[11px] text-slate-400 truncate">الإدارة العليا</div>
       </div>
-      <div class="glass-card rounded-2xl p-4">
-        <div class="text-[11px] text-slate-400">المنتجات الديناميكية (products.json)</div>
-        <div id="statCount" class="text-xl font-extrabold text-goldBright font-mono mt-0.5">0</div>
-      </div>
-      <div class="glass-card rounded-2xl p-4">
-        <div class="text-[11px] text-slate-400">وقت التحديث على الموقع</div>
-        <div class="text-sm font-extrabold text-white mt-1">~15 – 25 ثانية</div>
-      </div>
-      <div class="glass-card rounded-2xl p-4 flex items-center justify-between gap-2">
-        <div>
-          <div class="text-[11px] text-slate-400">مزامنة القائمة</div>
-          <div class="text-xs text-slate-300 mt-1">تحديث فوري من المستودع</div>
-        </div>
-        <button id="refreshBtn" type="button" class="px-3 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/15 transition">↻ تحديث</button>
-      </div>
-    </section>
+      <nav id="sidebarNav" class="space-y-1 text-xs font-bold">
+        <button type="button" data-sec="dashboard" data-perm="dashboard.view" class="nav-item active w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>📊</span><span>إدارة الشركة (Dashboard)</span></button>
+        <button type="button" data-sec="cms" data-perm="cms.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🌐</span><span>إدارة الموقع (CMS)</span></button>
+        <button type="button" data-sec="staff" data-perm="staff.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>👥</span><span>الموظفون والصلاحيات</span></button>
+        <button type="button" data-sec="marketing" data-perm="marketing.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>📣</span><span>مركز التسويق والنشر</span></button>
+        <button type="button" data-sec="store" data-perm="products.view,orders.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🛒</span><span>المتجر والمنتجات والطلبات</span></button>
+        <button type="button" data-sec="signals" data-perm="signals.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>📈</span><span>التداول والإشارات</span></button>
+        <button type="button" data-sec="academy" data-perm="academy.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🎓</span><span>الأكاديمية التعليمية</span></button>
+        <button type="button" data-sec="agencies" data-perm="agencies.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🤝</span><span>الوكالات (IB)</span></button>
+        <button type="button" data-sec="projects" data-perm="projects.view,chat.access" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>📋</span><span>المشاريع والمهام والمحادثات</span></button>
+        <button type="button" data-sec="customers" data-perm="customers.view,support.view" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🎧</span><span>العملاء والتراخيص والدعم</span></button>
+        <button type="button" data-sec="ai" data-perm="ai.use" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🤖</span><span>مساعد المدير الذكي (AI)</span></button>
+        <button type="button" data-sec="security" data-perm="audit.view,reports.view,settings.manage" class="nav-item w-full text-right px-3 py-2.5 rounded-xl border border-transparent hover:border-gold/30 flex items-center gap-2.5"><span>🔒</span><span>التقارير والنظام والأمان</span></button>
+      </nav>
+    </aside>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      <!-- LEFT/TOP: Add / Edit Product Panel -->
-      <section class="lg:col-span-5 glass-card rounded-3xl p-5 sm:p-6 space-y-5">
-        <div class="flex items-center justify-between gap-2">
-          <h2 id="formHeading" class="text-base font-extrabold gold-gradient-text">إضافة منتج جديد</h2>
-          <button id="resetFormBtn" type="button" class="hidden text-xs text-slate-400 hover:text-goldBright">✕ إلغاء التعديل</button>
-        </div>
+    <!-- Main Workspace Area -->
+    <main class="flex-1 p-4 sm:p-6 space-y-6 overflow-x-hidden">
 
-        <!-- Tabs: AI Prompt vs Full Form -->
-        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-obsidian/80 border border-slate-800">
-          <button type="button" data-editor-tab="form" class="editor-tab-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition">📝 النموذج الكامل</button>
-          <button type="button" data-editor-tab="ai" class="editor-tab-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">🤖 نشر بالذكاء الاصطناعي</button>
+      <!-- 1. DASHBOARD SECTION -->
+      <section id="sec-dashboard" class="admin-sec space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-extrabold gold-gradient-text">لوحة المعلومات المركزية (Company Overview)</h2>
+            <p class="text-xs text-slate-400">مؤشرات الأداء الحية من قاعدة البيانات المركزية — اضغط على أي بطاقة لفتح قسمها</p>
+          </div>
+          <button id="refreshDashBtn" type="button" class="px-3.5 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold">↻ تحديث المؤشرات</button>
         </div>
 
-        <!-- AI Quick Publish Form -->
-        <form id="aiPublishForm" class="hidden space-y-4">
-          <div id="aiNoticeBox" class="text-[11px] text-slate-300 bg-navyLight/70 border border-gold/20 rounded-xl p-3 leading-relaxed">
-            اكتب وصف المنتج بحرية (عربي أو إنجليزي)، وسيقوم <strong>Cloudflare Workers AI</strong> تلقائياً باستخراج الاسم، المنصة، الفئة، السعر، الخصم، والمميزات ونشره فوراً!
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">وصف المنتج الحر</label>
-            <textarea id="aiPrompt" rows="4" class="input-field" placeholder="مثال: انشر مؤشر سونا لتريدنق فيو بسعر 30 دولار بدل 60 دولار للذهب فريم 5 دقائق يعطي إشارات شراء وبيع دقيقة بدون إعادة رسم"></textarea>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">صورة المنتج (اختياري)</label>
-            <input id="aiImageInput" type="file" accept="image/*" class="input-field text-xs" />
-            <img id="aiImagePreview" class="hidden mt-2 w-20 h-20 rounded-xl object-cover border border-gold/40" alt="معاينة" />
-          </div>
-          <button id="aiSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs sm:text-sm font-extrabold hover:opacity-95 transition">
-            🤖 تحليل ونشر المنتج بالذكاء الاصطناعي
-          </button>
-        </form>
+        <div id="dashKpiGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5"></div>
 
-        <!-- Structured Product Form -->
-        <form id="productForm" class="space-y-3.5">
-          <input type="hidden" id="fId" />
-          <input type="hidden" id="fExistingImage" />
-
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">اسم المنتج *</label>
-            <input id="fName" type="text" required class="input-field" placeholder="مثال: MGD Sniper Gold EA" />
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">السعر ($) *</label>
-              <input id="fPrice" type="number" min="0" step="any" required class="input-field font-mono" placeholder="149" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">السعر القديم ($) (اختياري)</label>
-              <input id="fOldPrice" type="number" min="0" step="any" class="input-field font-mono" placeholder="299" />
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 space-y-3">
+            <h3 class="text-sm font-extrabold text-white">⚡ وصول سريع لإدارات الشركة</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-bold">
+              <button type="button" onclick="openSection('store')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">🛒 إضافة منتج / مراجعة طلب</button>
+              <button type="button" onclick="openSection('staff')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">👥 إضافة موظف وتخصيص صلاحياته</button>
+              <button type="button" onclick="openSection('marketing')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">📣 جدولة حملة تسويقية</button>
+              <button type="button" onclick="openSection('cms')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">🌐 تعديل نصوص وأقسام الموقع</button>
+              <button type="button" onclick="openSection('signals')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">📈 نشر إشارة تداول BUY/SELL</button>
+              <button type="button" onclick="openSection('ai')" class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 hover:border-gold/50 text-right">🤖 استشارة مساعد المدير الذكي</button>
             </div>
           </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">المنصة</label>
-              <select id="fPlatform" class="input-field">
-                <option value="MT5">MT5</option>
-                <option value="MT4">MT4</option>
-                <option value="TradingView">TradingView</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الفئة</label>
-              <select id="fCategory" class="input-field">
-                <option value="EA">EA (روبوت تداول)</option>
-                <option value="مؤشر">مؤشر</option>
-                <option value="أداة">أداة / لوحة تحكم</option>
-              </select>
-            </div>
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-3">
+            <h3 class="text-sm font-extrabold text-white">🕒 آخر الأنشطة المسجّلة (Audit Trail)</h3>
+            <div id="dashAuditList" class="space-y-2 max-h-60 overflow-y-auto text-xs"></div>
           </div>
-
-          <div class="grid grid-cols-3 gap-2.5">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الشارة</label>
-              <input id="fBadge" type="text" class="input-field text-xs" placeholder="جديد / خصم 50%" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الحالة</label>
-              <select id="fStatus" class="input-field text-xs">
-                <option value="جاهز للبيع">جاهز للبيع</option>
-                <option value="قيد التطوير">قيد التطوير</option>
-                <option value="قريباً">قريباً</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الإصدار</label>
-              <input id="fVersion" type="text" class="input-field text-xs font-mono" value="v1.0" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الأسواق / الرمز</label>
-              <input id="fSymbol" type="text" class="input-field text-xs" value="XAUUSD" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">الفريم الزمني</label>
-              <input id="fTimeframe" type="text" class="input-field text-xs" value="M5 - H1" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">الوصف *</label>
-            <textarea id="fDesc" rows="3" required class="input-field" placeholder="وصف احترافي مختصر للمنتج..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">المميزات (كل ميزة في سطر منفصل)</label>
-            <textarea id="fFeatures" rows="3" class="input-field" placeholder="فلترة اتجاه تلقائية&#10;وقف خسارة ديناميكي&#10;بدون مضاعفات"></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">اسم الملف (اختياري)</label>
-              <input id="fFileName" type="text" class="input-field text-xs font-mono" placeholder="MGD_Bot.ex5" dir="ltr" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">رابط التحميل (اختياري)</label>
-              <input id="fDownloadUrl" type="url" class="input-field text-xs font-mono" placeholder="https://..." dir="ltr" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">صورة المنتج (PNG / JPG)</label>
-            <input id="fImageInput" type="file" accept="image/*" class="input-field text-xs" />
-            <div id="fImagePreviewWrap" class="hidden mt-2 flex items-center gap-3">
-              <img id="fImagePreview" class="w-16 h-16 rounded-xl object-cover border border-gold/40" alt="معاينة الصورة" />
-              <span id="fImageName" class="text-[11px] text-slate-400 font-mono"></span>
-            </div>
-          </div>
-
-          <button id="saveProductBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-sm font-extrabold hover:opacity-95 transition shadow-lg shadow-gold/20">
-            💾 حفظ ونشر المنتج على الموقع
-          </button>
-        </form>
+        </div>
       </section>
 
-      <!-- RIGHT: Products List -->
-      <section class="lg:col-span-7 glass-card rounded-3xl p-5 sm:p-6 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 class="text-base font-extrabold text-white">المنتجات المضافة (البوت + لوحة التحكم)</h2>
-            <p class="text-[11px] text-slate-400">اضغط <strong>تعديل</strong> لتصحيح أي منتج أو <strong>حذف</strong> لإزالته من المتجر فوراً.</p>
+      <!-- 2. CMS SECTION -->
+      <section id="sec-cms" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">🌐 إدارة نصوص وأقسام الموقع الرئيسي</h2>
+            <form id="cmsConfigForm" class="space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">عنوان الموقع (Browser Title)</label>
+                <input id="cmsSiteTitle" type="text" class="input-field" placeholder="MGD Trading Technology | www.mgdtrading.com" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">العنوان الرئيسي (Hero Heading)</label>
+                <input id="cmsHeroTitle" type="text" class="input-field" placeholder="تكنولوجيا التداول بمعايير ملكية" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">الوصف الترحيبي (Hero Subtitle)</label>
+                <textarea id="cmsHeroSubtitle" rows="2" class="input-field" placeholder="روبوتات التداول الآلي MT4/MT5 والمؤشرات الاحترافية..."></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">إخفاء أقسام من القائمة العامة (اختياري)</label>
+                <div class="flex flex-wrap gap-3 text-xs bg-obsidian/70 p-3 rounded-xl border border-slate-800">
+                  <label class="flex items-center gap-1.5"><input type="checkbox" value="store" class="cms-hide-sec accent-gold" /> إخفاء المتجر</label>
+                  <label class="flex items-center gap-1.5"><input type="checkbox" value="signals" class="cms-hide-sec accent-gold" /> إخفاء الإشارات</label>
+                  <label class="flex items-center gap-1.5"><input type="checkbox" value="academy" class="cms-hide-sec accent-gold" /> إخفاء الأكاديمية</label>
+                  <label class="flex items-center gap-1.5"><input type="checkbox" value="agencies" class="cms-hide-sec accent-gold" /> إخفاء الوكالات</label>
+                </div>
+              </div>
+              <div class="flex gap-2 pt-2">
+                <button type="button" onclick="saveCmsConfig('draft')" class="flex-1 py-2.5 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold">💾 حفظ كمسودة</button>
+                <button type="button" onclick="saveCmsConfig('published')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">🚀 نشر مباشر على الموقع</button>
+              </div>
+            </form>
           </div>
-          <input id="searchInput" type="text" class="input-field sm:w-56 text-xs" placeholder="🔍 بحث بالاسم أو المعرّف..." />
+
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">📄 إضافة / تعديل صفحات الموقع المخصصة</h2>
+            <form id="cmsPageForm" class="space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">معرّف الرابط (Slug)</label>
+                  <input id="pgSlug" type="text" required class="input-field font-mono" placeholder="about-us" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">عنوان الصفحة في القائمة</label>
+                  <input id="pgTitle" type="text" required class="input-field" placeholder="من نحن" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">محتوى الصفحة</label>
+                <textarea id="pgBody" rows="4" required class="input-field" placeholder="اكتب محتوى الصفحة هنا..."></textarea>
+              </div>
+              <label class="flex items-center gap-2 text-xs text-slate-300">
+                <input id="pgPublished" type="checkbox" checked class="accent-gold" /> نشر الصفحة في القائمة الرئيسية للموقع
+              </label>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">حفظ الصفحة</button>
+            </form>
+            <div id="cmsPagesList" class="space-y-2 pt-2 text-xs"></div>
+          </div>
         </div>
 
-        <div id="productsList" class="space-y-3">
-          <div class="text-center py-10 text-xs text-slate-400">جاري تحميل المنتجات...</div>
-        </div>
-
-        <!-- Hide built-in catalog item -->
-        <div class="pt-4 border-t border-slate-800/80">
-          <details class="text-xs text-slate-400">
-            <summary class="cursor-pointer font-bold text-slate-300 hover:text-goldBright">إخفاء منتج من الكتالوج الأساسي (p1 – p44)</summary>
-            <div class="mt-3 flex gap-2">
-              <input id="hideCatalogId" type="text" class="input-field text-xs font-mono" placeholder="أدخل المعرّف مثل p2" dir="ltr" />
-              <button id="hideCatalogBtn" type="button" class="px-4 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold hover:bg-rose-500/30 shrink-0">إخفاء</button>
-            </div>
-          </details>
+        <div class="glass-card rounded-2xl p-5 space-y-3">
+          <h3 class="text-sm font-extrabold text-white">⏪ سجل نسخ وتعديلات الموقع (CMS Revisions — إمكانية الاسترجاع)</h3>
+          <div id="cmsRevisionsList" class="space-y-2 text-xs"></div>
         </div>
       </section>
-    </div>
-  </main>
+
+      <!-- 3. STAFF & GRANULAR RBAC SECTION -->
+      <section id="sec-staff" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 id="staffFormTitle" class="text-base font-extrabold gold-gradient-text">👥 إنشاء حساب موظف وتخصيص صلاحياته</h2>
+              <button id="staffResetBtn" type="button" onclick="resetStaffForm()" class="hidden text-xs text-slate-400 hover:text-goldBright">✕ إلغاء</button>
+            </div>
+            <form id="staffForm" class="space-y-3">
+              <input type="hidden" id="stId" />
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">اسم الموظف *</label>
+                  <input id="stName" type="text" required class="input-field" placeholder="أحمد محمد" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">البريد الإلكتروني *</label>
+                  <input id="stEmail" type="email" required class="input-field" placeholder="staff@mgdtrading.com" dir="ltr" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">القسم</label>
+                  <input id="stDept" type="text" class="input-field" value="التسويق" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">المسمى الوظيفي</label>
+                  <input id="stRoleTitle" type="text" class="input-field" value="موظف تسويق" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">كلمة المرور</label>
+                  <input id="stPassword" type="password" class="input-field" placeholder="6+ أحرف (أو اتركه عند التعديل)" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">قالب صلاحيات سريع</label>
+                  <select id="stPreset" class="input-field text-xs">
+                    <option value="">-- اختر قالباً لتعبئة الصلاحيات --</option>
+                    <option value="deputy_manager">نائب المدير</option>
+                    <option value="marketing_manager">مدير التسويق</option>
+                    <option value="marketing_staff">موظف التسويق</option>
+                    <option value="support_manager">مدير خدمة العملاء</option>
+                    <option value="support_staff">موظف الدعم</option>
+                    <option value="trading_manager">مدير التداول</option>
+                    <option value="trading_analyst">محلل التداول</option>
+                    <option value="products_manager">مدير المنتجات</option>
+                    <option value="academy_manager">مدير الأكاديمية</option>
+                    <option value="agencies_manager">مدير الوكالات</option>
+                    <option value="projects_manager">مدير المشاريع</option>
+                    <option value="projects_staff">موظف المشاريع</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-goldBright mb-1.5">تخصيص الصلاحيات الفردية للموظف (تُطبّق في الخادم وقاعدة البيانات):</label>
+                <div id="stPermsCheckboxes" class="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto p-3 rounded-xl bg-obsidian/80 border border-slate-800 text-[11px]"></div>
+              </div>
+
+              <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">
+                💾 حفظ حساب الموظف والصلاحيات
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold text-white">حسابات الموظفين والأدوار النشطة</h2>
+            <div id="staffListBox" class="space-y-3 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MARKETING & SOCIAL MEDIA CENTER -->
+      <section id="sec-marketing" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">📣 مركز التسويق والنشر (MGD SOCIAL MEDIA CENTER)</h2>
+            <div class="p-3 rounded-xl bg-obsidian/70 border border-gold/30 space-y-2">
+              <label class="block text-xs font-bold text-goldBright">🤖 توليد إعلان أو منشور بالذكاء الاصطناعي</label>
+              <div class="flex gap-2">
+                <input id="mkAiPrompt" type="text" class="input-field text-xs" placeholder="مثال: حملة خصم 50% على روبوت الذهب MGD Aurum" />
+                <button type="button" onclick="generateMarketingAI()" class="px-3 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold shrink-0">توليد</button>
+              </div>
+            </div>
+            <form id="marketingPostForm" class="space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">عنوان الحملة / المنشور</label>
+                <input id="mkTitle" type="text" class="input-field" placeholder="عرض خاص لمتداولي الذهب" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">نص المنشور *</label>
+                <textarea id="mkBody" rows="4" required class="input-field" placeholder="اكتب نص الإعلان أو المنشور..."></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الهاشتاقات</label>
+                  <input id="mkTags" type="text" class="input-field text-xs" placeholder="#MGD #Gold #MT5" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الرابط المرفق</label>
+                  <input id="mkLink" type="url" class="input-field text-xs" value="https://mgdtrading.vercel.app/#store" dir="ltr" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">المنصات المستهدفة</label>
+                <div class="flex flex-wrap gap-3 text-xs bg-obsidian/70 p-2.5 rounded-xl border border-slate-800">
+                  <label class="flex items-center gap-1"><input type="checkbox" value="telegram" checked class="mk-plat accent-gold" /> Telegram</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="facebook" class="mk-plat accent-gold" /> Facebook</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="instagram" class="mk-plat accent-gold" /> Instagram</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="tiktok" class="mk-plat accent-gold" /> TikTok</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="youtube" class="mk-plat accent-gold" /> YouTube</label>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">موعد الجدولة (اختياري)</label>
+                  <input id="mkSchedule" type="datetime-local" class="input-field text-xs" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الإجراء</label>
+                  <select id="mkStatus" class="input-field text-xs">
+                    <option value="pending_approval">إرسال لموافقة المدير</option>
+                    <option value="scheduled">جدولة النشر</option>
+                    <option value="draft">حفظ كمسودة</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">حفظ المنشور في تقويم التسويق</button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold text-white">📅 تقويم المنشورات، سير الموافقات، وسجل النشر</h2>
+            <div id="marketingPostsList" class="space-y-3 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. STORE, PRODUCTS, CATEGORIES & ORDERS SECTION -->
+      <section id="sec-store" class="admin-sec hidden space-y-6">
+        <!-- Sub-tabs: Products vs Orders -->
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="switchStoreTab('products')" id="tabBtnProducts" class="px-4 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold">📦 إدارة المنتجات</button>
+          <button type="button" onclick="switchStoreTab('orders')" id="tabBtnOrders" class="px-4 py-2 rounded-xl bg-navyLight border border-slate-700 text-slate-300 text-xs font-bold">🧾 الطلبات وإصدار التراخيص</button>
+        </div>
+
+        <div id="storeSubProducts" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 id="prodFormHeading" class="text-sm font-extrabold gold-gradient-text">إضافة / تعديل منتج</h3>
+              <button id="prodResetBtn" type="button" onclick="resetProductForm()" class="hidden text-xs text-slate-400">✕ إلغاء</button>
+            </div>
+            <!-- AI Quick Box -->
+            <div class="p-3 rounded-xl bg-obsidian/70 border border-gold/25 space-y-2">
+              <label class="block text-xs font-bold text-goldBright">🤖 نشر سريع بالذكاء الاصطناعي (وصف حر)</label>
+              <textarea id="aiQuickPrompt" rows="2" class="input-field text-xs" placeholder="مثال: انشر مؤشر سونا لتريدنق فيو بسعر 30 دولار بدل 60 للذهب"></textarea>
+              <button type="button" onclick="publishProductAI()" class="w-full py-2 rounded-lg bg-gold/20 border border-gold/50 text-goldBright text-xs font-extrabold hover:bg-gold/30">تحليل ونشر بالذكاء الاصطناعي</button>
+            </div>
+
+            <form id="productForm" class="space-y-3">
+              <input type="hidden" id="fId" />
+              <input type="hidden" id="fExistingImage" />
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">اسم المنتج *</label>
+                <input id="fName" type="text" required class="input-field" placeholder="MGD Sniper Gold EA" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">السعر ($) *</label>
+                  <input id="fPrice" type="number" min="0" step="any" required class="input-field font-mono" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">السعر السابق ($)</label>
+                  <input id="fOldPrice" type="number" min="0" step="any" class="input-field font-mono" />
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">المنصة</label>
+                  <select id="fPlatform" class="input-field text-xs">
+                    <option value="MT5">MT5</option>
+                    <option value="MT4">MT4</option>
+                    <option value="TradingView">TradingView</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الفئة</label>
+                  <select id="fCategory" class="input-field text-xs">
+                    <option value="EA">EA</option>
+                    <option value="مؤشر">مؤشر</option>
+                    <option value="أداة">أداة</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الشارة</label>
+                  <input id="fBadge" type="text" class="input-field text-xs" placeholder="جديد" />
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الترخيص</label>
+                  <select id="fLicType" class="input-field text-xs">
+                    <option value="lifetime">مدى الحياة</option>
+                    <option value="yearly">سنوي</option>
+                    <option value="monthly">شهري</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الأجهزة</label>
+                  <input id="fMaxDevices" type="number" min="1" value="1" class="input-field text-xs font-mono" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">الرمز / الفريم</label>
+                  <input id="fSymbol" type="text" value="XAUUSD" class="input-field text-xs" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">الوصف *</label>
+                <textarea id="fDesc" rows="2" required class="input-field"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">المميزات (سطر لكل ميزة)</label>
+                <textarea id="fFeatures" rows="2" class="input-field"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">صورة المنتج</label>
+                <input id="fImageInput" type="file" accept="image/*" class="input-field text-xs" />
+              </div>
+              <button id="saveProductBtn" type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">💾 حفظ ونشر المنتج</button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-extrabold text-white">المنتجات المضافة (<span id="prodCountLabel">0</span>)</h3>
+              <input id="prodSearchInput" type="text" class="input-field w-48 text-xs" placeholder="🔍 بحث..." />
+            </div>
+            <div id="productsListBox" class="space-y-2.5 max-h-[600px] overflow-y-auto text-xs"></div>
+          </div>
+        </div>
+
+        <div id="storeSubOrders" class="hidden glass-card rounded-2xl p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="text-base font-extrabold gold-gradient-text">🧾 إدارة طلبات العملاء والموافقة وإصدار التراخيص</h3>
+            <div class="flex gap-2">
+              <select id="orderStatusFilter" onchange="loadOrders()" class="input-field w-36 text-xs">
+                <option value="">كل الحالات</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="approved">تمت الموافقة</option>
+                <option value="rejected">مرفوض</option>
+              </select>
+              <button type="button" onclick="loadOrders()" class="px-3 py-1.5 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold">↻ تحديث</button>
+            </div>
+          </div>
+          <div id="ordersListBox" class="space-y-3 text-xs"></div>
+        </div>
+      </section>
+
+      <!-- 6. TRADING SIGNALS SECTION -->
+      <section id="sec-signals" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 glass-card rounded-2xl p-5 space-y-3">
+            <h2 class="text-base font-extrabold gold-gradient-text">📈 نشر إشارة تداول BUY / SELL</h2>
+            <form id="signalForm" class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div><label class="text-xs text-slate-300">الزوج *</label><input id="sigSymbol" type="text" required value="XAUUSD" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">الاتجاه *</label><select id="sigDir" class="input-field font-bold"><option value="BUY">BUY (شراء)</option><option value="SELL">SELL (بيع)</option></select></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <div><label class="text-xs text-slate-300">الدخول *</label><input id="sigEntry" type="text" required placeholder="2650.00" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">الوقف SL</label><input id="sigSl" type="text" placeholder="2642.00" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">الهدف TP1</label><input id="sigTp1" type="text" placeholder="2665.00" class="input-field font-mono" /></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <div><label class="text-xs text-slate-300">الفريم</label><input id="sigTf" type="text" value="M15" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">الحالة</label><select id="sigStatus" class="input-field text-xs"><option value="active">نشطة</option><option value="tp_hit">حقق الهدف ✅</option><option value="sl_hit">ضرب الوقف</option><option value="closed">مغلقة</option></select></div>
+                <div><label class="text-xs text-slate-300">النقاط (Pips)</label><input id="sigPips" type="number" value="0" class="input-field font-mono" /></div>
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">نشر الإشارة على الموقع</button>
+            </form>
+          </div>
+          <div class="lg:col-span-8 glass-card rounded-2xl p-5 space-y-3">
+            <h3 class="text-sm font-extrabold text-white">الإشارات المنشورة ونتائجها</h3>
+            <div id="signalsListBox" class="space-y-2.5 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. ACADEMY SECTION -->
+      <section id="sec-academy" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 glass-card rounded-2xl p-5 space-y-3">
+            <h2 class="text-base font-extrabold gold-gradient-text">🎓 إضافة درس / فيديو للأكاديمية</h2>
+            <form id="academyForm" class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div><label class="text-xs text-slate-300">رقم الدرس</label><input id="acNum" type="text" placeholder="81" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">التصنيف</label><input id="acCat" type="text" value="استراتيجية عملية" class="input-field" /></div>
+              </div>
+              <div><label class="text-xs text-slate-300">عنوان الدرس *</label><input id="acTitle" type="text" required class="input-field" /></div>
+              <div><label class="text-xs text-slate-300">شرح الدرس *</label><textarea id="acDesc" rows="3" required class="input-field"></textarea></div>
+              <div><label class="text-xs text-slate-300">رابط الفيديو (اختياري)</label><input id="acVideo" type="url" class="input-field text-xs" dir="ltr" /></div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">نشر الدرس في الأكاديمية</button>
+            </form>
+          </div>
+          <div class="lg:col-span-8 glass-card rounded-2xl p-5 space-y-3">
+            <h3 class="text-sm font-extrabold text-white">الدروس المضافة ديناميكياً</h3>
+            <div id="academyListBox" class="space-y-2.5 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. AGENCIES SECTION -->
+      <section id="sec-agencies" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 glass-card rounded-2xl p-5 space-y-3">
+            <h2 class="text-base font-extrabold gold-gradient-text">🤝 إدارة الوكالات والـ IB</h2>
+            <form id="agencyForm" class="space-y-3">
+              <div><label class="text-xs text-slate-300">اسم الوكيل / الوكالة *</label><input id="agName" type="text" required class="input-field" /></div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div><label class="text-xs text-slate-300">الوسيط (Broker)</label><input id="agBroker" type="text" value="TopFX" class="input-field" /></div>
+                <div><label class="text-xs text-slate-300">عدد العملاء</label><input id="agClients" type="number" value="0" class="input-field font-mono" /></div>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div><label class="text-xs text-slate-300">نسبة العمولة (%)</label><input id="agComm" type="number" step="any" value="15" class="input-field font-mono" /></div>
+                <div><label class="text-xs text-slate-300">إجمالي العقود/المبيعات ($)</label><input id="agVol" type="number" step="any" value="0" class="input-field font-mono" /></div>
+              </div>
+              <div><label class="text-xs text-slate-300">رابط الإحالة (IB Link)</label><input id="agLink" type="url" value="https://ct.topfx.com/?u=AliAmjd" class="input-field text-xs" dir="ltr" /></div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">حفظ بيانات الوكالة</button>
+            </form>
+          </div>
+          <div class="lg:col-span-8 glass-card rounded-2xl p-5 space-y-3">
+            <h3 class="text-sm font-extrabold text-white">سجل الوكالات والعمولات</h3>
+            <div id="agenciesListBox" class="space-y-2.5 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. PROJECTS, TASKS & INTERNAL TEAM CHAT -->
+      <section id="sec-projects" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">📋 المشاريع والمهام</h2>
+            <form id="projectForm" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input id="prName" type="text" required placeholder="اسم المشروع الجديد..." class="input-field" />
+              <input id="prDue" type="date" class="input-field text-xs" dir="ltr" />
+              <button type="submit" class="py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold">+ إنشاء مشروع</button>
+            </form>
+            <form id="taskForm" class="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
+              <input id="tkTitle" type="text" required placeholder="عنوان المهمة..." class="input-field sm:col-span-2" />
+              <select id="tkPriority" class="input-field text-xs"><option value="high">عاجل</option><option value="medium" selected>متوسط</option><option value="low">عادي</option></select>
+              <button type="submit" class="py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold">+ إضافة مهمة</button>
+            </form>
+            <div id="projectsTasksBox" class="space-y-2.5 max-h-80 overflow-y-auto text-xs"></div>
+          </div>
+
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 flex flex-col h-[460px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <h3 class="text-sm font-extrabold gold-gradient-text">💬 محادثات الفريق والغرف المشتركة</h3>
+              <select id="chatRoomSelect" onchange="loadChatMessages()" class="input-field w-48 text-xs"></select>
+            </div>
+            <div id="chatMessagesBox" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs"></div>
+            <form id="chatSendForm" class="flex gap-2 pt-2 border-t border-slate-800">
+              <input id="chatInput" type="text" required placeholder="اكتب رسالة للفريق..." class="input-field" />
+              <button type="submit" class="px-4 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold shrink-0">إرسال</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. CUSTOMERS, LICENSES & SUPPORT TICKETS -->
+      <section id="sec-customers" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">🔑 العملاء والتراخيص (Licenses)</h2>
+            <form id="licenseForm" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input id="licProdName" type="text" required placeholder="اسم المنتج..." class="input-field" />
+              <select id="licType" class="input-field text-xs"><option value="lifetime">مدى الحياة</option><option value="yearly">سنوي</option><option value="monthly">شهري</option></select>
+              <button type="submit" class="py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold">+ إصدار ترخيص</button>
+            </form>
+            <div id="licensesListBox" class="space-y-2 max-h-96 overflow-y-auto text-xs"></div>
+          </div>
+
+          <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">🎧 تذاكر الدعم الفني وطلبات الخدمة</h2>
+            <div id="ticketsListBox" class="space-y-2.5 max-h-96 overflow-y-auto text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. MGD AI ASSISTANT (WITH PREVIEW & CONFIRMATION) -->
+      <section id="sec-ai" class="admin-sec hidden space-y-6">
+        <div class="max-w-3xl mx-auto glass-card rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-extrabold gold-gradient-text">🤖 MGD AI ASSISTANT — المساعد الإداري الذكي للمدير</h2>
+              <p class="text-xs text-slate-400">ينفذ الأوامر الإدارية ويعرض معاينة واضحة مع طلب تأكيدك قبل أي إضافة أو نشر</p>
+            </div>
+          </div>
+          <div id="aiChatHistory" class="h-80 overflow-y-auto p-4 rounded-2xl bg-obsidian/80 border border-slate-800 space-y-3 text-xs">
+            <div class="p-3 rounded-xl bg-navyLight border border-gold/25 text-slate-200">
+              مرحباً بك سيادة المدير! يمكنك أن تطلب مني:
+              <br>• "أعطني تقريراً عن المبيعات والطلبات والعملاء"
+              <br>• "جهز منتج جديد باسم MGD Gold Master بسعر 199 دولار لمنصة MT5"
+              <br>• "أنشئ حملة تسويقية لروبوتات الذهب"
+              <br>• "انشر إشارة شراء XAUUSD من 2655 هدف 2675 وقف 2645"
+            </div>
+          </div>
+          <div id="aiConfirmBox" class="hidden p-4 rounded-2xl bg-amber-500/10 border border-gold space-y-3 text-xs"></div>
+          <form id="aiAssistantForm" class="flex gap-2">
+            <input id="aiAssistantInput" type="text" required placeholder="اكتب أمرك الإداري هنا..." class="input-field" />
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold shrink-0">إرسال ↵</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- 12. SECURITY, AUDIT LOG & BACKUP -->
+      <section id="sec-security" class="admin-sec hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 glass-card rounded-2xl p-5 space-y-4">
+            <h2 class="text-base font-extrabold gold-gradient-text">🔒 الأمان والنسخ الاحتياطي</h2>
+            <form id="changePassForm" class="space-y-3">
+              <label class="block text-xs font-bold text-slate-300">تغيير كلمة المرور الخاصة بحسابك</label>
+              <input id="newPassInput" type="password" minlength="8" required placeholder="كلمة المرور الجديدة (8+ أحرف)" class="input-field" dir="ltr" />
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gold text-obsidian text-xs font-extrabold">تحديث كلمة المرور وإبطال الجلسات الأخرى</button>
+            </form>
+            <div class="pt-4 border-t border-slate-800 space-y-2">
+              <div class="text-xs font-bold text-white">📦 النسخ الاحتياطي لقاعدة البيانات</div>
+              <p class="text-[11px] text-slate-400">تصدير نسخة كاملة لجميع جداول النظام (الموظفون، الصلاحيات، الطلبات، العملاء، التراخيص، التسويق، المشاريع، وسجل الأنشطة) بصيغة JSON.</p>
+              <button type="button" onclick="downloadBackup()" class="w-full py-2.5 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/15">⬇️ تنزيل نسخة احتياطية كاملة (JSON Backup)</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 glass-card rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-extrabold text-white">📜 سجل العمليات والأمان الشامل (Immutable Audit Log)</h3>
+              <button type="button" onclick="loadAuditLogs()" class="px-3 py-1 rounded-lg bg-navyLight border border-gold/30 text-goldBright text-xs">↻ تحديث</button>
+            </div>
+            <div id="auditLogFullBox" class="space-y-2 max-h-[520px] overflow-y-auto text-xs font-mono"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
 
   <script>
-    const GH_OWNER = 'ahmadahmd3133133-lang';
-    const GH_REPO = 'mgdtrading';
-    const GH_BRANCH = 'main';
-    const STORAGE_KEY = 'mgd_admin_session_v1';
+    const STORAGE_KEY = 'mgd_control_center_session_v3';
+    const PERM_LABELS = {
+      'dashboard.view': 'مشاهدة لوحة المعلومات',
+      'cms.view': 'مشاهدة إعدادات الموقع', 'cms.edit': 'تعديل مسودات الموقع', 'cms.publish': 'نشر تعديلات الموقع',
+      'products.view': 'مشاهدة المنتجات', 'products.create': 'إضافة منتجات', 'products.edit': 'تعديل المنتجات', 'products.delete': 'حذف المنتجات',
+      'orders.view': 'مشاهدة الطلبات', 'orders.approve': 'قبول/رفض الطلبات',
+      'customers.view': 'مشاهدة العملاء', 'customers.manage': 'إدارة العملاء', 'licenses.manage': 'إصدار وإدارة التراخيص',
+      'staff.view': 'مشاهدة الموظفين', 'staff.manage': 'إدارة الموظفين والصلاحيات',
+      'marketing.view': 'مشاهدة التسويق', 'marketing.create': 'إنشاء منشورات تسويقية', 'marketing.schedule': 'جدولة المنشورات', 'marketing.approve': 'اعتماد المنشورات', 'marketing.publish': 'النشر المباشر للمنصات',
+      'signals.view': 'مشاهدة الإشارات', 'signals.manage': 'نشر وإدارة إشارات التداول',
+      'academy.view': 'مشاهدة الأكاديمية', 'academy.manage': 'إدارة دروس الأكاديمية',
+      'agencies.view': 'مشاهدة الوكالات', 'agencies.manage': 'إدارة الوكالات والعمولات',
+      'projects.view': 'مشاهدة المشاريع', 'projects.manage': 'إدارة المشاريع والمهام', 'chat.access': 'دخول محادثات الفريق',
+      'support.view': 'مشاهدة تذاكر الدعم', 'support.manage': 'الرد وإدارة تذاكر الدعم',
+      'reports.view': 'مشاهدة التقارير', 'reports.export': 'تصدير التقارير والنسخ الاحتياطي',
+      'ai.use': 'استخدام مساعد المدير الذكي', 'audit.view': 'مشاهدة سجل النشاط والأمان', 'settings.manage': 'إدارة إعدادات النظام',
+    };
 
-    let session = null;
+    let session = null; // { workerUrl, token, user, permissions, allPermissions, rolePresets }
     let productsCache = [];
     let selectedImageB64 = null;
     let selectedImageExt = 'png';
-    let aiImageB64 = null;
-    let aiImageExt = 'png';
-    let currentAuthMode = 'worker';
+    let pendingAiAction = null;
 
     const $ = id => document.getElementById(id);
-
     function esc(s) {
       return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
-
     function showToast(msg, isError = false) {
       const el = $('toast');
       el.textContent = msg;
@@ -346,512 +720,855 @@
       }`;
       el.classList.remove('hidden');
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 4000);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 4200);
     }
 
-    function slugify(text) {
-      const clean = String(text || 'product').trim().replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-      return (clean || 'MGD_Product') + '_' + Date.now().toString(36);
+    function hasPerm(permExpr) {
+      if (!session) return false;
+      if (session.user?.role_key === 'super_admin') return true;
+      return String(permExpr || '').split(',').some(p => (session.permissions || []).includes(p.trim()));
     }
 
-    function utf8ToB64(str) {
-      const bytes = new TextEncoder().encode(str);
-      let bin = '';
-      for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-      return btoa(bin);
-    }
-
-    function b64ToUtf8(b64) {
-      const bin = atob(String(b64 || '').replace(/\s+/g, ''));
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      return new TextDecoder().decode(bytes);
-    }
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const dataUrl = String(reader.result || '');
-          const b64 = dataUrl.replace(/^data:[^;]+;base64,/, '');
-          const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
-          resolve({ b64, ext, dataUrl });
-        };
-        reader.onerror = () => reject(new Error('فشل قراءة الصورة'));
-        reader.readAsDataURL(file);
+    async function api(method, path, body = null) {
+      const base = (session?.workerUrl || 'https://mgdtrading.vercel.app').replace(/\/+$/, '');
+      const headers = { 'Authorization': `Bearer ${session?.token || ''}` };
+      if (body) headers['Content-Type'] = 'application/json';
+      const res = await fetch(`${base}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
       });
-    }
-
-    async function ghFetch(path, options = {}) {
-      const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
-      return fetch(url, {
-        ...options,
-        headers: {
-          'Authorization': `Bearer ${session.githubToken}`,
-          'Accept': 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28',
-          ...(options.headers || {}),
-        },
-      });
-    }
-
-    async function ghLoadProducts() {
-      const res = await ghFetch(`products.json?ref=${GH_BRANCH}&t=${Date.now()}`);
-      if (res.status === 404) return { items: [], sha: null };
-      if (!res.ok) throw new Error(`خطأ GitHub (${res.status}) — تأكد من صحة المفتاح وصلاحية Contents`);
-      const data = await res.json();
-      const parsed = JSON.parse(b64ToUtf8(data.content || 'W10='));
-      return { items: Array.isArray(parsed) ? parsed : [], sha: data.sha };
-    }
-
-    async function ghSaveProducts(items, sha, message) {
-      const body = {
-        message,
-        content: utf8ToB64(JSON.stringify(items, null, 2) + '\n'),
-        branch: GH_BRANCH,
-        ...(sha ? { sha } : {}),
-      };
-      const res = await ghFetch('products.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error(`فشل الحفظ في GitHub (${res.status})`);
-      return res.json();
-    }
-
-    async function ghUploadImage(name, b64, ext) {
-      const fileName = `${slugify(name)}.${ext}`;
-      const rel = `assets/products/${fileName}`;
-      const res = await ghFetch(rel, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: `Upload ${fileName}`, content: b64, branch: GH_BRANCH }),
-      });
-      if (!res.ok) throw new Error(`فشل رفع الصورة إلى GitHub (${res.status})`);
-      return `./${rel}`;
-    }
-
-    async function apiListProducts() {
-      if (session.mode === 'worker') {
-        const res = await fetch(`${session.workerUrl}/api/products`, {
-          headers: { 'Authorization': `Bearer ${session.adminSecret}` },
-        });
-        if (res.status === 401) throw new Error('كلمة مرور الإدارة (ADMIN_SECRET) غير صحيحة.');
-        if (!res.ok) throw new Error(`خطأ من الخادم (${res.status})`);
-        const data = await res.json();
-        return Array.isArray(data.products) ? data.products : [];
-      } else {
-        const { items } = await ghLoadProducts();
-        return items;
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        doLogout('انتهت الجلسة أو تم إبطالها — يرجى تسجيل الدخول مجدداً.');
+        throw new Error(data.error || 'Unauthorized');
       }
+      if (!res.ok) throw new Error(data.error || `خطأ (${res.status})`);
+      return data;
     }
 
-    async function apiSaveProduct(payload) {
-      if (session.mode === 'worker') {
-        const res = await fetch(`${session.workerUrl}/api/products`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.adminSecret}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || `خطأ من الخادم (${res.status})`);
-        return data.product;
-      } else {
-        const { items, sha } = await ghLoadProducts();
-        const product = { ...payload };
-        delete product.imageBase64;
-        delete product.imageExt;
-        if (!product.id) product.id = 'web_' + Date.now().toString(36);
-        if (payload.imageBase64) {
-          product.image = await ghUploadImage(product.name, payload.imageBase64, payload.imageExt || 'png');
-        }
-        const idx = items.findIndex(p => p.id === product.id);
-        if (idx >= 0) items[idx] = { ...items[idx], ...product };
-        else items.push(product);
-        await ghSaveProducts(items, sha, `Update product via Admin Panel: ${product.name}`);
-        return product;
-      }
+    // --- Navigation & RBAC Visibility ---
+    function applyRbacNavigation() {
+      $('userBadgeName').textContent = session.user.name;
+      $('userBadgeRole').textContent = `${session.user.role_title} • ${session.user.department}`;
+      $('headerUserSubtitle').textContent = `مرحباً ${session.user.name} (${session.user.role_title})`;
+
+      let firstAllowed = null;
+      document.querySelectorAll('#sidebarNav [data-sec]').forEach(btn => {
+        const allowed = hasPerm(btn.dataset.perm);
+        btn.classList.toggle('hidden', !allowed);
+        if (allowed && !firstAllowed) firstAllowed = btn.dataset.sec;
+      });
+      openSection(firstAllowed || 'dashboard');
     }
 
-    async function apiDeleteProduct(id) {
-      if (session.mode === 'worker') {
-        const res = await fetch(`${session.workerUrl}/api/products/${encodeURIComponent(id)}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${session.adminSecret}` },
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || `فشل الحذف (${res.status})`);
-        return true;
-      } else {
-        const { items, sha } = await ghLoadProducts();
-        const filtered = items.filter(p => p.id !== id);
-        if (filtered.length === items.length) filtered.push({ id, deleted: true });
-        await ghSaveProducts(filtered, sha, `Delete product via Admin Panel: ${id}`);
-        return true;
-      }
+    function openSection(secId) {
+      document.querySelectorAll('.admin-sec').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('#sidebarNav .nav-item').forEach(b => b.classList.toggle('active', b.dataset.sec === secId));
+      const target = $('sec-' + secId);
+      if (target) target.classList.remove('hidden');
+
+      if (secId === 'dashboard') loadDashboard();
+      if (secId === 'cms') loadCms();
+      if (secId === 'staff') loadStaff();
+      if (secId === 'marketing') loadMarketing();
+      if (secId === 'store') { loadProducts(); if (hasPerm('orders.view')) loadOrders(); }
+      if (secId === 'signals') loadSignals();
+      if (secId === 'academy') loadAcademy();
+      if (secId === 'agencies') loadAgencies();
+      if (secId === 'projects') { loadProjects(); if (hasPerm('chat.access')) loadChatRooms(); }
+      if (secId === 'customers') { if (hasPerm('customers.view')) loadCustomers(); if (hasPerm('support.view')) loadTickets(); }
+      if (secId === 'security') { if (hasPerm('audit.view')) loadAuditLogs(); }
     }
 
-    function renderProducts() {
-      const q = ($('searchInput').value || '').trim().toLowerCase();
-      const active = productsCache.filter(p => !p.deleted);
-      const hidden = productsCache.filter(p => p.deleted);
-      $('statCount').textContent = active.length;
+    document.querySelectorAll('#sidebarNav [data-sec]').forEach(btn => {
+      btn.addEventListener('click', () => openSection(btn.dataset.sec));
+    });
+    $('mobileMenuBtn').addEventListener('click', () => $('sidebar').classList.toggle('hidden'));
+    $('langToggleBtn').addEventListener('click', () => {
+      const html = document.documentElement;
+      const isRtl = html.dir !== 'ltr';
+      html.dir = isRtl ? 'ltr' : 'rtl';
+      html.lang = isRtl ? 'en' : 'ar';
+    });
 
-      const filtered = active.filter(p => !q || `${p.name} ${p.id} ${p.platform} ${p.category} ${p.desc}`.toLowerCase().includes(q));
-      const box = $('productsList');
-
-      if (!filtered.length) {
-        box.innerHTML = `<div class="text-center py-10 rounded-2xl bg-obsidian/60 border border-slate-800 text-xs text-slate-400">
-          ${active.length ? 'لا توجد نتائج مطابقة للبحث.' : 'لا توجد منتجات مضافة في products.json بعد.'}
-        </div>`;
-      } else {
-        box.innerHTML = filtered.map(p => `
-          <div class="p-4 rounded-2xl bg-obsidian/70 border border-slate-800 hover:border-gold/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-start gap-3 min-w-0">
-              <div class="w-14 h-14 rounded-xl bg-navyLight border border-gold/30 flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                ${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" class="w-full h-full object-cover" onerror="this.remove()">` : esc(p.icon || '⚡')}
-              </div>
-              <div class="min-w-0 space-y-1">
-                <div class="flex flex-wrap items-center gap-1.5">
-                  <h3 class="text-sm font-extrabold text-white truncate">${esc(p.name)}</h3>
-                  <span class="px-2 py-0.5 rounded bg-navyLight border border-gold/30 text-goldBright text-[10px] font-mono font-bold">${esc(p.platform || 'MT5')}</span>
-                  <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">${esc(p.category || 'EA')}</span>
-                  ${p.badge ? `<span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px] font-bold">${esc(p.badge)}</span>` : ''}
-                </div>
-                <p class="text-xs text-slate-400 line-clamp-2">${esc(p.desc || '')}</p>
-                <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 font-mono">
-                  <span class="text-goldBright font-extrabold">$${Number(p.price || 0).toLocaleString('en-US')}${p.oldPrice ? ` <span class="line-through text-slate-500 font-normal">$${Number(p.oldPrice).toLocaleString('en-US')}</span>` : ''}</span>
-                  <span>ID: ${esc(p.id)}</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex sm:flex-col gap-2 shrink-0">
-              <button type="button" data-edit-id="${esc(p.id)}" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-gold/15 border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/25 transition">✏️ تعديل</button>
-              <button type="button" data-delete-id="${esc(p.id)}" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/25 transition">🗑️ حذف</button>
-            </div>
+    // --- 1. Dashboard ---
+    async function loadDashboard() {
+      if (!hasPerm('dashboard.view')) return;
+      try {
+        const d = await api('GET', '/api/dashboard');
+        const s = d.stats || {};
+        const cards = [
+          { label: 'إجمالي الإيرادات المعتمدة', val: `$${Number(s.totalRevenue || 0).toLocaleString()}`, sub: `طلبات معتمدة: ${s.approvedOrders || 0}`, sec: 'store' },
+          { label: 'الطلبات الجديدة / المعلقة', val: s.pendingOrders || 0, sub: `إجمالي الطلبات: ${s.totalOrders || 0}`, sec: 'store' },
+          { label: 'العملاء والتراخيص النشطة', val: s.customersCount || 0, sub: `تراخيص فعالة: ${s.activeLicenses || 0}`, sec: 'customers' },
+          { label: 'المنتجات في المتجر', val: s.productsCount || 44, sub: 'جاهزة للبيع والتسليم', sec: 'store' },
+          { label: 'إشارات التداول المنشورة', val: s.signalsTotal || 0, sub: `حققت الهدف: ${s.signalsWins || 0}`, sec: 'signals' },
+          { label: 'الحملات والمنشورات', val: s.postsTotal || 0, sub: `مجدول: ${s.postsScheduled || 0} | للموافقة: ${s.postsPendingApproval || 0}`, sec: 'marketing' },
+          { label: 'المشاريع الجارية', val: s.activeProjects || 0, sub: `مهام متأخرة: ${s.overdueTasks || 0}`, sec: 'projects' },
+          { label: 'الموظفون والتذاكر المفتوحة', val: s.activeStaff || 1, sub: `تذاكر دعم مفتوحة: ${s.openTickets || 0}`, sec: 'staff' },
+        ];
+        $('dashKpiGrid').innerHTML = cards.map(c => `
+          <div onclick="openSection('${c.sec}')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-gold transition">
+            <div class="text-[11px] text-slate-400">${esc(c.label)}</div>
+            <div class="text-xl font-extrabold text-goldBright font-mono mt-1">${esc(c.val)}</div>
+            <div class="text-[11px] text-slate-400 mt-1">${esc(c.sub)}</div>
           </div>
         `).join('');
-      }
 
-      if (hidden.length) {
-        box.innerHTML += `<div class="pt-3 text-[11px] text-slate-500">منتجات كتالوج مخفية: ${hidden.map(h => `<code class="px-1.5 py-0.5 rounded bg-slate-900 text-slate-300 font-mono">${esc(h.id)}</code>`).join(' ')}</div>`;
-      }
+        $('dashAuditList').innerHTML = (d.recentActivity || []).map(a => `
+          <div class="p-2.5 rounded-xl bg-obsidian/70 border border-slate-800 flex items-center justify-between gap-2">
+            <div><strong class="text-goldBright">${esc(a.actor_name)}</strong>: <span class="text-slate-300 font-mono">${esc(a.action)}</span> ${a.resource_id ? `<span class="text-slate-500">(${esc(a.resource_id)})</span>` : ''}</div>
+            <span class="text-[10px] text-slate-500 font-mono">${esc(String(a.created_at || '').slice(11, 19))}</span>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد أنشطة مسجلة بعد.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+    $('refreshDashBtn').addEventListener('click', loadDashboard);
+
+    // --- 2. CMS ---
+    async function loadCms() {
+      try {
+        const d = await api('GET', '/api/cms');
+        const cfg = d.config?.site_settings?.value || {};
+        $('cmsSiteTitle').value = cfg.siteTitle || '';
+        $('cmsHeroTitle').value = cfg.heroTitle || '';
+        $('cmsHeroSubtitle').value = cfg.heroSubtitle || '';
+        const hidden = cfg.hiddenSections || [];
+        document.querySelectorAll('.cms-hide-sec').forEach(cb => { cb.checked = hidden.includes(cb.value); });
+
+        $('cmsPagesList').innerHTML = (d.pages || []).map(p => `
+          <div class="p-3 rounded-xl bg-obsidian/70 border border-slate-800 flex items-center justify-between">
+            <div><strong class="text-white">${esc(p.title)}</strong> <code class="text-goldBright font-mono">/${esc(p.slug)}</code></div>
+            <button type="button" onclick="deleteCmsPage('${esc(p.slug)}')" class="text-rose-400 hover:underline">حذف</button>
+          </div>
+        `).join('');
+
+        $('cmsRevisionsList').innerHTML = (d.revisions || []).map(r => `
+          <div class="p-2.5 rounded-xl bg-obsidian/70 border border-slate-800 flex items-center justify-between">
+            <span>نسخة #${r.id} — <strong>${esc(r.target_key)}</strong> بواسطة ${esc(r.created_by)} (${esc(String(r.created_at).slice(0, 16))})</span>
+            <button type="button" onclick="restoreRevision(${r.id})" class="px-2.5 py-1 rounded bg-gold/20 text-goldBright font-bold">استرجاع ⏪</button>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد نسخ سابقة بعد.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    async function saveCmsConfig(status) {
+      try {
+        const hiddenSections = Array.from(document.querySelectorAll('.cms-hide-sec:checked')).map(c => c.value);
+        await api('PUT', '/api/cms/config', {
+          key: 'site_settings',
+          status,
+          value: {
+            siteTitle: $('cmsSiteTitle').value.trim(),
+            heroTitle: $('cmsHeroTitle').value.trim(),
+            heroSubtitle: $('cmsHeroSubtitle').value.trim(),
+            hiddenSections,
+          },
+        });
+        showToast(status === 'published' ? '🚀 تم نشر تعديلات الموقع مباشرة!' : '💾 تم حفظ المسودة.');
+        loadCms();
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    $('cmsPageForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/cms/pages', {
+          slug: $('pgSlug').value.trim(),
+          title: $('pgTitle').value.trim(),
+          content: { body: $('pgBody').value },
+          is_published: $('pgPublished').checked,
+        });
+        $('cmsPageForm').reset();
+        showToast('✅ تم حفظ الصفحة بنجاح!');
+        loadCms();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function deleteCmsPage(slug) {
+      if (!confirm(`حذف الصفحة (${slug})؟`)) return;
+      try { await api('DELETE', `/api/cms/pages/${encodeURIComponent(slug)}`); showToast('تم حذف الصفحة.'); loadCms(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    async function restoreRevision(id) {
+      if (!confirm(`استرجاع النسخة رقم #${id}؟`)) return;
+      try { await api('POST', `/api/cms/revisions/${id}/restore`); showToast('تم استرجاع النسخة السابقة بنجاح!'); loadCms(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    // --- 3. Staff & Granular RBAC ---
+    let staffCache = [];
+    let rolePresetsCache = {};
+
+    function renderPermCheckboxes(selected = []) {
+      const all = Object.keys(PERM_LABELS);
+      $('stPermsCheckboxes').innerHTML = all.map(p => `
+        <label class="flex items-center gap-1.5 p-1 rounded hover:bg-navyLight/50 cursor-pointer">
+          <input type="checkbox" value="${esc(p)}" class="st-perm-cb accent-gold" ${selected.includes(p) ? 'checked' : ''} />
+          <span>${esc(PERM_LABELS[p] || p)}</span>
+        </label>
+      `).join('');
+    }
+
+    $('stPreset').addEventListener('change', e => {
+      const preset = rolePresetsCache[e.target.value];
+      if (preset) renderPermCheckboxes(preset);
+    });
+
+    async function loadStaff() {
+      try {
+        const d = await api('GET', '/api/staff');
+        staffCache = d.staff || [];
+        rolePresetsCache = d.rolePresets || {};
+        renderPermCheckboxes(['dashboard.view']);
+        $('staffListBox').innerHTML = staffCache.filter(u => u.status !== 'deleted').map(u => `
+          <div class="p-4 rounded-2xl bg-obsidian/75 border border-slate-800 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <strong class="text-sm text-white">${esc(u.name)}</strong>
+                <span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px] font-bold mr-1">${esc(u.role_title)}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] ${u.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${u.status === 'active' ? 'نشط' : 'موقوف'}</span>
+                <div class="text-[11px] text-slate-400 font-mono">${esc(u.email)} • القسم: ${esc(u.department)} ${u.telegram_id ? `• TG: ${esc(u.telegram_id)}` : ''}</div>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="editStaff('${esc(u.id)}')" class="px-2.5 py-1 rounded-lg bg-gold/15 border border-gold/40 text-goldBright">✏️ تعديل الصلاحيات</button>
+                <button type="button" onclick="genTelegramCode('${esc(u.id)}')" class="px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-500/40 text-sky-300">🔗 ربط Telegram</button>
+                ${u.role_key !== 'super_admin' ? `
+                  <button type="button" onclick="toggleStaffStatus('${esc(u.id)}', '${u.status === 'active' ? 'suspend' : 'activate'}')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300">${u.status === 'active' ? '⏸ إيقاف' : '▶ تفعيل'}</button>
+                  <button type="button" onclick="deleteStaff('${esc(u.id)}')" class="px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300">🗑️</button>
+                ` : ''}
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400">الصلاحيات الممنوحة (${(u.permissions || []).length}): <span class="text-slate-300">${(u.permissions || []).slice(0, 8).map(p => PERM_LABELS[p] || p).join('، ')}${(u.permissions || []).length > 8 ? '...' : ''}</span></div>
+          </div>
+        `).join('');
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    function editStaff(id) {
+      const u = staffCache.find(x => x.id === id);
+      if (!u) return;
+      $('stId').value = u.id;
+      $('stName').value = u.name;
+      $('stEmail').value = u.email;
+      $('stEmail').disabled = true;
+      $('stDept').value = u.department || '';
+      $('stRoleTitle').value = u.role_title || '';
+      $('stPassword').value = '';
+      renderPermCheckboxes(u.permissions || []);
+      $('staffFormTitle').textContent = `تعديل صلاحيات: ${u.name}`;
+      $('staffResetBtn').classList.remove('hidden');
+    }
+
+    function resetStaffForm() {
+      $('staffForm').reset();
+      $('stId').value = '';
+      $('stEmail').disabled = false;
+      $('staffFormTitle').textContent = '👥 إنشاء حساب موظف وتخصيص صلاحياته';
+      $('staffResetBtn').classList.add('hidden');
+      renderPermCheckboxes(['dashboard.view']);
+    }
+
+    $('staffForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('stId').value;
+      const permissions = Array.from(document.querySelectorAll('.st-perm-cb:checked')).map(c => c.value);
+      const payload = {
+        name: $('stName').value.trim(),
+        email: $('stEmail').value.trim(),
+        department: $('stDept').value.trim(),
+        role_title: $('stRoleTitle').value.trim(),
+        password: $('stPassword').value,
+        permissions,
+      };
+      try {
+        if (id) await api('PATCH', `/api/staff/${encodeURIComponent(id)}`, payload);
+        else await api('POST', '/api/staff', payload);
+        showToast('✅ تم حفظ حساب الموظف وصلاحياته!');
+        resetStaffForm();
+        loadStaff();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function toggleStaffStatus(id, act) {
+      if (!confirm(act === 'suspend' ? 'إيقاف الحساب وإبطال جلساته فوراً؟' : 'إعادة تفعيل الحساب؟')) return;
+      try { await api('POST', `/api/staff/${encodeURIComponent(id)}/${act}`); showToast('تم تحديث حالة الموظف.'); loadStaff(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    async function deleteStaff(id) {
+      if (!confirm('تأكيد حذف حساب الموظف مع الاحتفاظ بسجل العمليات؟')) return;
+      try { await api('DELETE', `/api/staff/${encodeURIComponent(id)}`); showToast('تم حذف الحساب.'); loadStaff(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    async function genTelegramCode(id) {
+      try {
+        const d = await api('POST', `/api/staff/${encodeURIComponent(id)}/telegram-code`);
+        prompt('أرسل هذا الأمر للموظف ليرسله إلى بوت تيليجرام خلال 30 دقيقة:', d.command);
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    // --- 4. Marketing & Social Media Center ---
+    async function generateMarketingAI() {
+      const prompt = $('mkAiPrompt').value.trim();
+      try {
+        showToast('🤖 جاري صياغة الإعلان بالذكاء الاصطناعي...');
+        const d = await api('POST', '/api/marketing/ai-generate', { prompt });
+        if (d.draft) {
+          $('mkTitle').value = d.draft.title || '';
+          $('mkBody').value = d.draft.body || '';
+          $('mkTags').value = d.draft.hashtags || '';
+          showToast('✨ تم توليد مسودة الإعلان بنجاح!');
+        }
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    async function loadMarketing() {
+      try {
+        const d = await api('GET', '/api/marketing/posts');
+        $('marketingPostsList').innerHTML = (d.posts || []).map(p => `
+          <div class="p-4 rounded-2xl bg-obsidian/75 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <strong class="text-white">${esc(p.title || 'منشور تسويقي')}</strong>
+                <span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px] font-bold mr-1">${esc(p.status)}</span>
+              </div>
+              <div class="flex gap-1.5">
+                ${hasPerm('marketing.approve') && p.status === 'pending_approval' ? `
+                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','approve')" class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold">✅ اعتماد</button>
+                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','reject')" class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300">❌ رفض</button>
+                ` : ''}
+                ${hasPerm('marketing.publish') && p.status !== 'published' ? `
+                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','publish')" class="px-2.5 py-1 rounded bg-gold text-obsidian font-extrabold">🚀 نشر الآن</button>
+                ` : ''}
+              </div>
+            </div>
+            <p class="text-slate-300 whitespace-pre-line">${esc(p.body)}</p>
+            <div class="text-[11px] text-slate-400 font-mono">المنصات: ${esc(p.platforms_json)} • بواسطة: ${esc(p.created_by || '-')} ${p.scheduled_at ? `• مجدول: ${esc(p.scheduled_at)}` : ''}</div>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد منشورات بعد.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    $('marketingPostForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const platforms = Array.from(document.querySelectorAll('.mk-plat:checked')).map(c => c.value);
+      try {
+        await api('POST', '/api/marketing/posts', {
+          title: $('mkTitle').value.trim(),
+          body: $('mkBody').value.trim(),
+          hashtags: $('mkTags').value.trim(),
+          link_url: $('mkLink').value.trim(),
+          platforms,
+          scheduled_at: $('mkSchedule').value || null,
+          status: $('mkStatus').value,
+        });
+        $('marketingPostForm').reset();
+        showToast('✅ تم حفظ المنشور في مركز التسويق!');
+        loadMarketing();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function actMarketingPost(id, act) {
+      if (act === 'publish' && !confirm('تأكيد النشر الفوري للمنشور على المنصات المحددة؟')) return;
+      try { await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`); showToast('تم تنفيذ الإجراء بنجاح!'); loadMarketing(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    // --- 5. Store, Products & Orders ---
+    function switchStoreTab(tab) {
+      $('storeSubProducts').classList.toggle('hidden', tab !== 'products');
+      $('storeSubOrders').classList.toggle('hidden', tab !== 'orders');
+      $('tabBtnProducts').className = tab === 'products' ? 'px-4 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold' : 'px-4 py-2 rounded-xl bg-navyLight border border-slate-700 text-slate-300 text-xs font-bold';
+      $('tabBtnOrders').className = tab === 'orders' ? 'px-4 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold' : 'px-4 py-2 rounded-xl bg-navyLight border border-slate-700 text-slate-300 text-xs font-bold';
+    }
+
+    async function loadProducts() {
+      try {
+        const d = await api('GET', '/api/products');
+        productsCache = (d.products || []).filter(p => !p.deleted);
+        renderProductsList();
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    function renderProductsList() {
+      const q = ($('prodSearchInput').value || '').trim().toLowerCase();
+      $('prodCountLabel').textContent = productsCache.length;
+      const list = productsCache.filter(p => !q || `${p.name} ${p.id} ${p.platform}`.toLowerCase().includes(q));
+      $('productsListBox').innerHTML = list.map(p => `
+        <div class="p-3.5 rounded-2xl bg-obsidian/75 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-12 h-12 rounded-xl bg-navyLight border border-gold/30 flex items-center justify-center overflow-hidden shrink-0">
+              ${p.image ? `<img src="${esc(p.image)}" class="w-full h-full object-cover" onerror="this.remove()">` : '⚡'}
+            </div>
+            <div class="min-w-0">
+              <div class="font-extrabold text-white truncate">${esc(p.name)} <span class="text-goldBright font-mono">$${esc(p.price)}</span></div>
+              <div class="text-[11px] text-slate-400 font-mono">${esc(p.platform)} • ${esc(p.category)} • ID: ${esc(p.id)}</div>
+            </div>
+          </div>
+          <div class="flex gap-1.5 shrink-0">
+            <button type="button" onclick="startEditProduct('${esc(p.id)}')" class="px-2.5 py-1 rounded-lg bg-gold/15 border border-gold/40 text-goldBright">✏️</button>
+            <button type="button" onclick="removeProduct('${esc(p.id)}')" class="px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300">🗑️</button>
+          </div>
+        </div>
+      `).join('') || '<div class="text-slate-500 py-6 text-center">لا توجد منتجات مضافة.</div>';
+    }
+    $('prodSearchInput').addEventListener('input', renderProductsList);
+
+    $('fImageInput').addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = () => {
+        selectedImageB64 = String(r.result || '').replace(/^data:[^;]+;base64,/, '');
+        selectedImageExt = (file.name.split('.').pop() || 'png').toLowerCase();
+      };
+      r.readAsDataURL(file);
+    });
+
+    function startEditProduct(id) {
+      const p = productsCache.find(x => x.id === id);
+      if (!p) return;
+      $('fId').value = p.id;
+      $('fName').value = p.name || '';
+      $('fPrice').value = p.price ?? 0;
+      $('fOldPrice').value = p.oldPrice || '';
+      $('fPlatform').value = p.platform || 'MT5';
+      $('fCategory').value = p.category || 'EA';
+      $('fBadge').value = p.badge || '';
+      $('fSymbol').value = p.symbol || 'XAUUSD';
+      $('fDesc').value = p.desc || '';
+      $('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
+      $('fExistingImage').value = p.image || '';
+      $('prodFormHeading').textContent = `تعديل: ${p.name}`;
+      $('prodResetBtn').classList.remove('hidden');
     }
 
     function resetProductForm() {
       $('productForm').reset();
       $('fId').value = '';
       $('fExistingImage').value = '';
-      $('fVersion').value = 'v1.0';
-      $('fSymbol').value = 'XAUUSD';
-      $('fTimeframe').value = 'M5 - H1';
       selectedImageB64 = null;
-      $('fImagePreviewWrap').classList.add('hidden');
-      $('formHeading').textContent = 'إضافة منتج جديد';
-      $('saveProductBtn').textContent = '💾 حفظ ونشر المنتج على الموقع';
-      $('resetFormBtn').classList.add('hidden');
+      $('prodFormHeading').textContent = 'إضافة / تعديل منتج';
+      $('prodResetBtn').classList.add('hidden');
     }
-
-    function startEditProduct(p) {
-      switchEditorTab('form');
-      $('fId').value = p.id || '';
-      $('fName').value = p.name || '';
-      $('fPrice').value = p.price ?? 0;
-      $('fOldPrice').value = p.oldPrice || '';
-      $('fPlatform').value = ['MT5', 'MT4', 'TradingView'].includes(p.platform) ? p.platform : 'MT5';
-      $('fCategory').value = ['EA', 'مؤشر', 'أداة'].includes(p.category) ? p.category : 'EA';
-      $('fBadge').value = p.badge || '';
-      $('fStatus').value = p.status || 'جاهز للبيع';
-      $('fVersion').value = p.version || 'v1.0';
-      $('fSymbol').value = p.symbol || 'XAUUSD';
-      $('fTimeframe').value = p.timeframe || 'M5 - H1';
-      $('fDesc').value = p.desc || '';
-      $('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
-      $('fFileName').value = p.fileName || '';
-      $('fDownloadUrl').value = p.downloadUrl || '';
-      $('fExistingImage').value = p.image || '';
-      selectedImageB64 = null;
-
-      if (p.image) {
-        $('fImagePreview').src = p.image;
-        $('fImageName').textContent = p.image;
-        $('fImagePreviewWrap').classList.remove('hidden');
-      } else {
-        $('fImagePreviewWrap').classList.add('hidden');
-      }
-
-      $('formHeading').textContent = `تعديل المنتج (${p.id})`;
-      $('saveProductBtn').textContent = '✅ حفظ التعديلات وتحديث الموقع';
-      $('resetFormBtn').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function switchEditorTab(tab) {
-      document.querySelectorAll('.editor-tab-btn').forEach(btn => {
-        const active = btn.dataset.editorTab === tab;
-        btn.className = active
-          ? 'editor-tab-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition'
-          : 'editor-tab-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
-      });
-      $('productForm').classList.toggle('hidden', tab !== 'form');
-      $('aiPublishForm').classList.toggle('hidden', tab !== 'ai');
-      if (tab === 'ai' && session?.mode !== 'worker') {
-        $('aiNoticeBox').innerHTML = '⚠️ ميزة النشر بالنص الحر عبر <strong>Workers AI</strong> تتطلب تسجيل الدخول بوضع <strong>Cloudflare AI (ADMIN_SECRET)</strong>. يمكنك استخدام <strong>النموذج الكامل</strong> هنا بوضع GitHub مباشر بدون VPN.';
-      }
-    }
-
-    async function loadDashboard() {
-      $('loginView').classList.add('hidden');
-      $('dashboardView').classList.remove('hidden');
-      $('logoutBtn').classList.remove('hidden');
-      $('statMode').textContent = session.mode === 'worker' ? 'Cloudflare Worker AI ✓' : 'GitHub مباشر (بدون VPN) ✓';
-      try {
-        productsCache = await apiListProducts();
-        renderProducts();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    }
-
-    document.querySelectorAll('.auth-mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentAuthMode = btn.dataset.authMode;
-        document.querySelectorAll('.auth-mode-btn').forEach(b => {
-          const on = b.dataset.authMode === currentAuthMode;
-          b.className = on
-            ? 'auth-mode-btn py-2 rounded-lg text-xs font-extrabold bg-gold text-obsidian transition'
-            : 'auth-mode-btn py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
-        });
-        $('workerAuthBox').classList.toggle('hidden', currentAuthMode !== 'worker');
-        $('githubAuthBox').classList.toggle('hidden', currentAuthMode !== 'github');
-        $('loginError').classList.add('hidden');
-      });
-    });
-
-    document.querySelectorAll('.editor-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchEditorTab(btn.dataset.editorTab));
-    });
-
-    $('loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const errBox = $('loginError');
-      errBox.classList.add('hidden');
-      const btn = $('loginSubmitBtn');
-      btn.disabled = true;
-      btn.textContent = 'جاري التحقق من الاتصال...';
-
-      try {
-        if (currentAuthMode === 'worker') {
-          const workerUrl = $('loginWorkerUrl').value.trim().replace(/\/+$/, '');
-          const adminSecret = $('loginAdminSecret').value.trim();
-          if (!adminSecret) throw new Error('أدخل كلمة مرور الإدارة ADMIN_SECRET.');
-          session = { mode: 'worker', workerUrl, adminSecret };
-        } else {
-          const githubToken = $('loginGithubToken').value.trim();
-          if (!githubToken) throw new Error('أدخل مفتاح GitHub (GITHUB_TOKEN).');
-          session = { mode: 'github', githubToken };
-        }
-
-        productsCache = await apiListProducts();
-        const store = $('rememberMe').checked ? localStorage : sessionStorage;
-        store.setItem(STORAGE_KEY, JSON.stringify(session));
-        await loadDashboard();
-        showToast('تم تسجيل الدخول بنجاح!');
-      } catch (err) {
-        session = null;
-        let msg = err.message || 'فشل الاتصال';
-        if (msg.includes('Failed to fetch') && currentAuthMode === 'worker') {
-          msg = 'تعذّر الوصول إلى Cloudflare Worker من شبكتك الحالية (قد يتطلب VPN). جرّب التبديل إلى تبويب "GitHub مباشر" بالأعلى ليعمل فوراً بدون VPN!';
-        }
-        errBox.textContent = msg;
-        errBox.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'دخول إلى لوحة التحكم';
-      }
-    });
-
-    $('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem(STORAGE_KEY);
-      sessionStorage.removeItem(STORAGE_KEY);
-      session = null;
-      $('dashboardView').classList.add('hidden');
-      $('logoutBtn').classList.add('hidden');
-      $('loginView').classList.remove('hidden');
-      showToast('تم تسجيل الخروج.');
-    });
-
-    $('refreshBtn').addEventListener('click', async () => {
-      try {
-        productsCache = await apiListProducts();
-        renderProducts();
-        showToast('تم تحديث القائمة بنجاح.');
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    });
-
-    $('searchInput').addEventListener('input', renderProducts);
-    $('resetFormBtn').addEventListener('click', resetProductForm);
-
-    $('fImageInput').addEventListener('change', async e => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const { b64, ext, dataUrl } = await fileToBase64(file);
-      selectedImageB64 = b64;
-      selectedImageExt = ext;
-      $('fImagePreview').src = dataUrl;
-      $('fImageName').textContent = file.name;
-      $('fImagePreviewWrap').classList.remove('hidden');
-    });
-
-    $('aiImageInput').addEventListener('change', async e => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const { b64, ext, dataUrl } = await fileToBase64(file);
-      aiImageB64 = b64;
-      aiImageExt = ext;
-      $('aiImagePreview').src = dataUrl;
-      $('aiImagePreview').classList.remove('hidden');
-    });
 
     $('productForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const btn = $('saveProductBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ جاري الحفظ والنشر...';
-
       try {
-        const price = Number($('fPrice').value || 0);
-        const oldPrice = $('fOldPrice').value ? Number($('fOldPrice').value) : undefined;
-        let badge = $('fBadge').value.trim();
-        if (!badge && oldPrice && oldPrice > price && price > 0) {
-          badge = `خصم ${Math.round(((oldPrice - price) / oldPrice) * 100)}%`;
-        } else if (!badge) {
-          badge = price === 0 ? 'مجاني' : 'جديد';
-        }
-        const features = $('fFeatures').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-        const category = $('fCategory').value;
-        const payload = {
+        await api('POST', '/api/products', {
           ...( $('fId').value ? { id: $('fId').value } : {} ),
           name: $('fName').value.trim(),
-          price,
-          ...(oldPrice && oldPrice > price ? { oldPrice } : {}),
+          price: Number($('fPrice').value || 0),
+          ...( $('fOldPrice').value ? { oldPrice: Number($('fOldPrice').value) } : {} ),
           platform: $('fPlatform').value,
-          category,
-          badge,
-          status: $('fStatus').value,
-          version: $('fVersion').value.trim() || 'v1.0',
-          symbol: $('fSymbol').value.trim() || 'XAUUSD',
-          timeframe: $('fTimeframe').value.trim() || 'M5 - H1',
-          icon: category === 'مؤشر' ? '📊' : '⚡',
+          category: $('fCategory').value,
+          badge: $('fBadge').value.trim(),
+          licenseType: $('fLicType').value,
+          maxDevices: Number($('fMaxDevices').value || 1),
+          symbol: $('fSymbol').value.trim(),
           desc: $('fDesc').value.trim(),
-          features: features.length ? features : [`متوافق بالكامل مع ${$('fPlatform').value}`, 'إدارة مخاطر ذكية', 'دعم فني وتحديثات مستمرة'],
-          ...( $('fFileName').value.trim() ? { fileName: $('fFileName').value.trim() } : {} ),
-          ...( $('fDownloadUrl').value.trim() ? { downloadUrl: $('fDownloadUrl').value.trim() } : {} ),
+          features: $('fFeatures').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean),
           ...( $('fExistingImage').value && !selectedImageB64 ? { image: $('fExistingImage').value } : {} ),
           ...( selectedImageB64 ? { imageBase64: selectedImageB64, imageExt: selectedImageExt } : {} ),
-        };
-
-        await apiSaveProduct(payload);
-        resetProductForm();
-        productsCache = await apiListProducts();
-        renderProducts();
-        showToast('✅ تم حفظ ونشر المنتج! سيظهر على المتجر خلال ~20 ثانية.');
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        if (!$('fId').value) btn.textContent = '💾 حفظ ونشر المنتج على الموقع';
-      }
-    });
-
-    $('aiPublishForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      if (session?.mode !== 'worker') {
-        showToast('النشر بالنص الحر عبر الذكاء الاصطناعي يعمل عند الدخول بوضع Cloudflare AI (ADMIN_SECRET).', true);
-        return;
-      }
-      const prompt = $('aiPrompt').value.trim();
-      if (!prompt) { showToast('اكتب وصف المنتج أولاً.', true); return; }
-      const btn = $('aiSubmitBtn');
-      btn.disabled = true;
-      btn.textContent = '🤖 جاري التحليل والنشر بالذكاء الاصطناعي...';
-
-      try {
-        await apiSaveProduct({
-          prompt,
-          ...(aiImageB64 ? { imageBase64: aiImageB64, imageExt: aiImageExt } : {}),
         });
-        $('aiPublishForm').reset();
-        aiImageB64 = null;
-        $('aiImagePreview').classList.add('hidden');
-        productsCache = await apiListProducts();
-        renderProducts();
-        showToast('🤖 تم التحليل بالذكاء الاصطناعي ونشر المنتج بنجاح!');
+        showToast('✅ تم حفظ ونشر المنتج بنجاح!');
+        resetProductForm();
+        loadProducts();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function publishProductAI() {
+      const prompt = $('aiQuickPrompt').value.trim();
+      if (!prompt) return;
+      try {
+        showToast('🤖 جاري تحليل المنتج ونشره...');
+        await api('POST', '/api/products', { prompt });
+        $('aiQuickPrompt').value = '';
+        showToast('✅ تم نشر المنتج بالذكاء الاصطناعي!');
+        loadProducts();
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    async function removeProduct(id) {
+      if (!confirm(`تأكيد حذف المنتج (${id})؟`)) return;
+      try { await api('DELETE', `/api/products/${encodeURIComponent(id)}`); showToast('تم الحذف.'); loadProducts(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    async function loadOrders() {
+      try {
+        const st = $('orderStatusFilter').value;
+        const d = await api('GET', `/api/orders${st ? '?status=' + st : ''}`);
+        $('ordersListBox').innerHTML = (d.orders || []).map(o => `
+          <div class="p-4 rounded-2xl bg-obsidian/75 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="font-extrabold text-white">#${esc(o.id)} — ${esc(o.product_name)} <span class="text-goldBright font-mono">(${esc(o.price_label)})</span></div>
+              <div class="text-[11px] text-slate-400">العميل: ${esc(o.buyer_name)} • التواصل: ${esc(o.contact)} • الدفع: ${esc(o.payment_method)} ${o.tx_ref ? `(${esc(o.tx_ref)})` : ''}</div>
+              ${o.license_key ? `<div class="text-[11px] text-emerald-400 font-mono">🔑 الترخيص: ${esc(o.license_key)}</div>` : ''}
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded text-xs font-bold ${o.status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' : o.status === 'rejected' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'}">${esc(o.status)}</span>
+              ${hasPerm('orders.approve') && o.status === 'pending' ? `
+                <button type="button" onclick="actOrder('${esc(o.id)}','approve')" class="px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold">✅ موافقة وترخيص</button>
+                <button type="button" onclick="actOrder('${esc(o.id)}','reject')" class="px-3 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300">❌ رفض</button>
+              ` : ''}
+            </div>
+          </div>
+        `).join('') || '<div class="text-slate-500 py-6 text-center">لا توجد طلبات مسجلة في قاعدة البيانات بعد.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    async function actOrder(id, act) {
+      let downloadUrl = '';
+      if (act === 'approve') downloadUrl = prompt('رابط تحميل ملف المنتج للعميل (اختياري):', '') || '';
+      try { await api('POST', `/api/orders/${encodeURIComponent(id)}/${act}`, { downloadUrl }); showToast('تم تحديث حالة الطلب!'); loadOrders(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    // --- 6. Signals ---
+    async function loadSignals() {
+      try {
+        const d = await api('GET', '/api/signals');
+        $('signalsListBox').innerHTML = (d.signals || []).map(s => `
+          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 flex items-center justify-between">
+            <div>
+              <strong class="text-white font-mono">${esc(s.symbol)}</strong>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.direction === 'BUY' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${esc(s.direction)}</span>
+              <span class="text-slate-400 font-mono text-[11px] mr-2">Entry: ${esc(s.entry_price)} | SL: ${esc(s.stop_loss)} | TP1: ${esc(s.tp1)} (${esc(s.status)})</span>
+            </div>
+            <button type="button" onclick="deleteSignal('${esc(s.id)}')" class="text-rose-400">🗑️</button>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد إشارات منشورة بعد.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+    $('signalForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/signals', {
+          symbol: $('sigSymbol').value.trim(),
+          direction: $('sigDir').value,
+          entry_price: $('sigEntry').value.trim(),
+          stop_loss: $('sigSl').value.trim(),
+          tp1: $('sigTp1').value.trim(),
+          timeframe: $('sigTf').value.trim(),
+          status: $('sigStatus').value,
+          result_pips: Number($('sigPips').value || 0),
+        });
+        $('signalForm').reset();
+        showToast('✅ تم نشر الإشارة على الموقع!');
+        loadSignals();
+      } catch (err) { showToast(err.message, true); }
+    });
+    async function deleteSignal(id) {
+      if (!confirm('حذف الإشارة؟')) return;
+      await api('DELETE', `/api/signals/${encodeURIComponent(id)}`);
+      loadSignals();
+    }
+
+    // --- 7. Academy ---
+    async function loadAcademy() {
+      try {
+        const d = await api('GET', '/api/academy');
+        $('academyListBox').innerHTML = (d.lessons || []).map(l => `
+          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 flex items-center justify-between">
+            <div><strong class="text-goldBright">#${esc(l.num)} ${esc(l.title)}</strong> <span class="text-slate-400">(${esc(l.category)})</span><div class="text-slate-400 text-[11px]">${esc(l.description)}</div></div>
+            <button type="button" onclick="deleteLesson('${esc(l.id)}')" class="text-rose-400">🗑️</button>
+          </div>
+        `).join('') || '<div class="text-slate-500">لم تُضف دروس إضافية بعد (80 درساً أساسياً نشطة في الموقع).</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+    $('academyForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/academy', {
+          num: $('acNum').value.trim(),
+          category: $('acCat').value.trim(),
+          title: $('acTitle').value.trim(),
+          description: $('acDesc').value.trim(),
+          video_url: $('acVideo').value.trim(),
+        });
+        $('academyForm').reset();
+        showToast('✅ تم نشر الدرس في الأكاديمية!');
+        loadAcademy();
+      } catch (err) { showToast(err.message, true); }
+    });
+    async function deleteLesson(id) {
+      if (!confirm('حذف الدرس؟')) return;
+      await api('DELETE', `/api/academy/${encodeURIComponent(id)}`);
+      loadAcademy();
+    }
+
+    // --- 8. Agencies ---
+    async function loadAgencies() {
+      try {
+        const d = await api('GET', '/api/agencies');
+        $('agenciesListBox').innerHTML = (d.agencies || []).map(a => `
+          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 flex items-center justify-between">
+            <div><strong class="text-white">${esc(a.name)}</strong> (${esc(a.broker)}) — العملاء: <strong class="text-goldBright">${a.clients_count}</strong> • العمولة: ${a.commission_rate}% • الحجم: $${a.total_volume}</div>
+            <a href="${esc(a.referral_link)}" target="_blank" class="text-goldBright hover:underline">رابط الـ IB ↗</a>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد وكالات إضافية مسجلة.</div>';
+      } catch (e) { showToast(e.message, true); }
+    }
+    $('agencyForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/agencies', {
+          name: $('agName').value.trim(),
+          broker: $('agBroker').value.trim(),
+          clients_count: Number($('agClients').value || 0),
+          commission_rate: Number($('agComm').value || 0),
+          total_volume: Number($('agVol').value || 0),
+          referral_link: $('agLink').value.trim(),
+        });
+        $('agencyForm').reset();
+        showToast('✅ تم حفظ الوكالة!');
+        loadAgencies();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    // --- 9. Projects, Tasks & Internal Team Chat ---
+    async function loadProjects() {
+      try {
+        const d = await api('GET', '/api/projects');
+        const pHtml = (d.projects || []).map(p => `<div class="p-3 rounded-xl bg-obsidian/80 border border-gold/30"><strong class="text-goldBright">📁 مشروع: ${esc(p.name)}</strong> (${p.progress}%) ${p.due_date ? `• الموعد: ${esc(p.due_date)}` : ''}</div>`).join('');
+        const tHtml = (d.tasks || []).map(t => `<div class="p-2.5 rounded-xl bg-obsidian/60 border border-slate-800 flex justify-between"><span>✓ ${esc(t.title)}</span><span class="px-2 py-0.5 rounded bg-slate-800 text-[10px]">${esc(t.priority)} • ${esc(t.status)}</span></div>`).join('');
+        $('projectsTasksBox').innerHTML = (pHtml + tHtml) || '<div class="text-slate-500">لا توجد مشاريع أو مهام بعد.</div>';
+      } catch (e) {}
+    }
+    $('projectForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try { await api('POST', '/api/projects', { name: $('prName').value.trim(), due_date: $('prDue').value || null }); $('projectForm').reset(); showToast('تم إنشاء المشروع وغرفة المحادثة الخاصة به!'); loadProjects(); loadChatRooms(); }
+      catch (err) { showToast(err.message, true); }
+    });
+    $('taskForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try { await api('POST', '/api/tasks', { title: $('tkTitle').value.trim(), priority: $('tkPriority').value }); $('taskForm').reset(); showToast('تمت إضافة المهمة!'); loadProjects(); }
+      catch (err) { showToast(err.message, true); }
+    });
+
+    async function loadChatRooms() {
+      try {
+        const d = await api('GET', '/api/chat/rooms');
+        const sel = $('chatRoomSelect');
+        sel.innerHTML = (d.rooms || []).map(r => `<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
+        if (sel.value) loadChatMessages();
+      } catch (e) {}
+    }
+    async function loadChatMessages() {
+      const roomId = $('chatRoomSelect').value;
+      if (!roomId) return;
+      try {
+        const d = await api('GET', `/api/chat/rooms/${encodeURIComponent(roomId)}/messages`);
+        const box = $('chatMessagesBox');
+        box.innerHTML = (d.messages || []).map(m => `
+          <div class="p-2.5 rounded-xl ${m.sender_id === session.user.id ? 'bg-gold/15 border border-gold/40' : 'bg-obsidian/80 border border-slate-800'}">
+            <div class="flex justify-between text-[10px] text-slate-400"><strong>${esc(m.sender_name)}</strong><span>${esc(String(m.created_at).slice(11, 16))}</span></div>
+            <div class="text-slate-200 mt-0.5">${esc(m.body)}</div>
+          </div>
+        `).join('') || '<div class="text-slate-500 text-center py-8">ابدأ المحادثة في هذه الغرفة...</div>';
+        box.scrollTop = box.scrollHeight;
+      } catch (e) {}
+    }
+    $('chatSendForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const roomId = $('chatRoomSelect').value;
+      const body = $('chatInput').value.trim();
+      if (!roomId || !body) return;
+      try { await api('POST', `/api/chat/rooms/${encodeURIComponent(roomId)}/messages`, { body }); $('chatInput').value = ''; loadChatMessages(); }
+      catch (err) { showToast(err.message, true); }
+    });
+
+    // --- 10. Customers, Licenses & Support Tickets ---
+    async function loadCustomers() {
+      try {
+        const d = await api('GET', '/api/customers');
+        $('licensesListBox').innerHTML = (d.licenses || []).map(l => `
+          <div class="p-3 rounded-xl bg-obsidian/75 border border-slate-800 flex items-center justify-between">
+            <div><code class="text-goldBright font-mono font-bold">${esc(l.license_key)}</code> — ${esc(l.product_name)} (${esc(l.license_type)})</div>
+            <button type="button" onclick="toggleLic('${esc(l.id)}','${l.status === 'active' ? 'suspended' : 'active'}')" class="px-2 py-0.5 rounded text-[10px] ${l.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${l.status === 'active' ? 'فعال (إيقاف)' : 'موقوف (تفعيل)'}</button>
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد تراخيص مصدرة بعد.</div>';
+      } catch (e) {}
+    }
+    $('licenseForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        const d = await api('POST', '/api/licenses', { product_name: $('licProdName').value.trim(), license_type: $('licType').value });
+        $('licenseForm').reset();
+        showToast(`🔑 تم إصدار الترخيص: ${d.license_key}`);
+        loadCustomers();
+      } catch (err) { showToast(err.message, true); }
+    });
+    async function toggleLic(id, status) {
+      await api('PATCH', `/api/licenses/${encodeURIComponent(id)}/status`, { status });
+      loadCustomers();
+    }
+
+    async function loadTickets() {
+      try {
+        const d = await api('GET', '/api/support/tickets');
+        $('ticketsListBox').innerHTML = (d.tickets || []).map(t => `
+          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 space-y-1.5">
+            <div class="flex justify-between"><strong>${esc(t.name)} (${esc(t.contact)})</strong><span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px]">${esc(t.status)}</span></div>
+            <div class="text-slate-300">${esc(t.topic)}: ${esc(t.message)}</div>
+            ${hasPerm('support.manage') && t.status !== 'closed' ? `<button type="button" onclick="closeTicket('${esc(t.id)}')" class="text-[11px] text-emerald-400 hover:underline">✓ إغلاق التذكرة</button>` : ''}
+          </div>
+        `).join('') || '<div class="text-slate-500">لا توجد تذاكر دعم مفتوحة.</div>';
+      } catch (e) {}
+    }
+    async function closeTicket(id) {
+      await api('PATCH', `/api/support/tickets/${encodeURIComponent(id)}`, { status: 'closed' });
+      loadTickets();
+    }
+
+    // --- 11. MGD AI Assistant (with Preview & Confirmation) ---
+    $('aiAssistantForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const msg = $('aiAssistantInput').value.trim();
+      if (!msg) return;
+      $('aiAssistantInput').value = '';
+      const hist = $('aiChatHistory');
+      hist.innerHTML += `<div class="p-3 rounded-xl bg-gold/15 border border-gold/40 text-goldBright font-bold">أنت: ${esc(msg)}</div>`;
+      hist.scrollTop = hist.scrollHeight;
+      try {
+        const d = await api('POST', '/api/ai/assistant', { message: msg });
+        hist.innerHTML += `<div class="p-3 rounded-xl bg-navyLight border border-slate-700 text-slate-200 whitespace-pre-line">🤖 <strong>MGD AI:</strong> ${esc(d.reply)}</div>`;
+        hist.scrollTop = hist.scrollHeight;
+        if (d.pendingConfirmation) {
+          pendingAiAction = d.pendingConfirmation;
+          const box = $('aiConfirmBox');
+          box.innerHTML = `
+            <div class="font-extrabold text-goldBright">⚠️ معاينة العملية قبل التنفيذ (${esc(pendingAiAction.type)}):</div>
+            <pre class="p-2.5 rounded-xl bg-obsidian text-[11px] font-mono overflow-x-auto" dir="ltr">${esc(JSON.stringify(pendingAiAction.payload, null, 2))}</pre>
+            <div class="flex gap-2">
+              <button type="button" onclick="confirmAiExecution()" class="px-4 py-2 rounded-xl bg-emerald-500 text-obsidian font-extrabold">✅ تأكيد وتنفيذ العملية</button>
+              <button type="button" onclick="$('aiConfirmBox').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-rose-500/20 text-rose-300">إلغاء</button>
+            </div>
+          `;
+          box.classList.remove('hidden');
+        }
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function confirmAiExecution() {
+      if (!pendingAiAction) return;
+      try {
+        const d = await api('POST', '/api/ai/assistant', { confirmAction: pendingAiAction });
+        $('aiConfirmBox').classList.add('hidden');
+        pendingAiAction = null;
+        $('aiChatHistory').innerHTML += `<div class="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 font-bold">${esc(d.reply)}</div>`;
+        showToast('✅ تم تنفيذ العملية وتسجيلها في سجل النشاط!');
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    // --- 12. Security, Audit Log & Backup ---
+    $('changePassForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/auth/change-password', { newPassword: $('newPassInput').value });
+        $('changePassForm').reset();
+        showToast('✅ تم تحديث كلمة المرور المشفرة وإبطال الجلسات الأخرى!');
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function loadAuditLogs() {
+      try {
+        const d = await api('GET', '/api/audit');
+        $('auditLogFullBox').innerHTML = (d.logs || []).map(l => `
+          <div class="p-2.5 rounded-xl bg-obsidian/75 border border-slate-800 flex flex-wrap justify-between gap-2">
+            <span><strong class="text-goldBright">${esc(l.actor_name)}</strong> [${esc(l.actor_role)}] → <code class="text-emerald-300">${esc(l.action)}</code> ${l.resource_type ? `(${esc(l.resource_type)}: ${esc(l.resource_id || '-')})` : ''}</span>
+            <span class="text-slate-500">${esc(String(l.created_at).slice(0, 19).replace('T', ' '))}</span>
+          </div>
+        `).join('');
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    async function downloadBackup() {
+      try {
+        const data = await api('GET', '/api/backup/export');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `MGD_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        showToast('📦 تم تنزيل النسخة الاحتياطية الكاملة بنجاح!');
+      } catch (e) { showToast(e.message, true); }
+    }
+
+    // --- Auth Login / Logout ---
+    $('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('loginError').classList.add('hidden');
+      const btn = $('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'جاري التحقق من الهوية والصلاحيات...';
+      try {
+        const workerUrl = $('loginWorkerUrl').value.trim().replace(/\/+$/, '');
+        const email = $('loginEmail').value.trim();
+        const password = $('loginPassword').value;
+        const res = await fetch(`${workerUrl}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `خطأ (${res.status})`);
+
+        session = { workerUrl, token: data.token, user: data.user, permissions: data.permissions || [] };
+        const store = $('rememberMe').checked ? localStorage : sessionStorage;
+        store.setItem(STORAGE_KEY, JSON.stringify(session));
+
+        $('loginView').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+        $('logoutBtn').classList.remove('hidden');
+        applyRbacNavigation();
+        showToast(`مرحباً بك ${data.user.name}!`);
       } catch (err) {
-        showToast(err.message, true);
+        $('loginError').textContent = err.message;
+        $('loginError').classList.remove('hidden');
       } finally {
         btn.disabled = false;
-        btn.textContent = '🤖 تحليل ونشر المنتج بالذكاء الاصطناعي';
+        btn.textContent = 'تسجيل الدخول الآمن';
       }
     });
 
-    $('productsList').addEventListener('click', async e => {
-      const editBtn = e.target.closest('[data-edit-id]');
-      if (editBtn) {
-        const p = productsCache.find(x => x.id === editBtn.dataset.editId);
-        if (p) startEditProduct(p);
-        return;
-      }
-      const delBtn = e.target.closest('[data-delete-id]');
-      if (delBtn) {
-        const id = delBtn.dataset.deleteId;
-        if (!confirm(`هل أنت متأكد من حذف المنتج (${id}) من المتجر؟`)) return;
-        delBtn.disabled = true;
-        delBtn.textContent = '...';
-        try {
-          await apiDeleteProduct(id);
-          productsCache = await apiListProducts();
-          renderProducts();
-          showToast(`🗑️ تم حذف المنتج (${id}) بنجاح.`);
-        } catch (err) {
-          showToast(err.message, true);
-          delBtn.disabled = false;
-          delBtn.textContent = '🗑️ حذف';
-        }
-      }
+    function doLogout(msg = 'تم تسجيل الخروج.') {
+      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY);
+      session = null;
+      $('appShell').classList.add('hidden');
+      $('logoutBtn').classList.add('hidden');
+      $('loginView').classList.remove('hidden');
+      showToast(msg);
+    }
+
+    $('logoutBtn').addEventListener('click', async () => {
+      try { await api('POST', '/api/auth/logout'); } catch {}
+      doLogout();
     });
 
-    $('hideCatalogBtn').addEventListener('click', async () => {
-      const id = $('hideCatalogId').value.trim();
-      if (!id) return;
-      if (!confirm(`إخفاء المنتج (${id}) من الكتالوج الأساسي في المتجر؟`)) return;
+    // Auto-restore active session
+    (async function init() {
+      const raw = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
       try {
-        await apiDeleteProduct(id);
-        $('hideCatalogId').value = '';
-        productsCache = await apiListProducts();
-        renderProducts();
-        showToast(`تم إخفاء المنتج (${id}) بنجاح.`);
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    });
-
-    (function init() {
-      const saved = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          session = JSON.parse(saved);
-          loadDashboard();
-        } catch {
-          localStorage.removeItem(STORAGE_KEY);
-          sessionStorage.removeItem(STORAGE_KEY);
-        }
+        session = JSON.parse(raw);
+        const me = await api('GET', '/api/auth/me');
+        session.user = me.user;
+        session.permissions = me.permissions || [];
+        $('loginView').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+        $('logoutBtn').classList.remove('hidden');
+        applyRbacNavigation();
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
+        session = null;
       }
     })();
   </script>
