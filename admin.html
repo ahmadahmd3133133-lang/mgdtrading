@@ -1284,15 +1284,64 @@
       return results;
     }
 
+    async function syncPublishedMediaToStorefront(postsList) {
+      try {
+        const list = postsList || (await api('GET', '/api/marketing/posts')).posts || [];
+        const pubList = list.filter(x => x.status === 'published' && (x.media_url || x.body)).slice(0, 24);
+        await api('PUT', '/api/cms/config', { key: 'media_posts', status: 'published', value: pubList });
+      } catch {}
+    }
+
+    function openMultiPlatformPublisherModal(post) {
+      let modal = document.getElementById('multiPlatformLaunchModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'multiPlatformLaunchModal';
+        modal.className = 'fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4';
+        document.body.appendChild(modal);
+      }
+      const fullText = [post.title || '', (post.body || '').replace(/🎬\s*https?:\/\/\S+/g, '').trim(), post.hashtags || '', post.link_url || ''].filter(Boolean).join('\n\n');
+      try { if (navigator.clipboard) navigator.clipboard.writeText(fullText); } catch {}
+
+      modal.innerHTML = `
+        <div class="glass-card rounded-3xl p-6 max-w-lg w-full border border-gold/50 space-y-4 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-base font-extrabold gold-gradient-text">🚀 تم النشر في الموقع وتيليجرام! أكمل النشر لبقية البرامج:</h3>
+              <p class="text-[11px] text-emerald-300 font-bold mt-0.5">📋 تم نسخ الوصف والهاشتاقات تلقائياً إلى حافظتك وجاهز للصق (Ctrl+V)</p>
+            </div>
+            <button type="button" onclick="document.getElementById('multiPlatformLaunchModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+          </div>
+          ${post.media_url ? `<div class="space-y-2">${renderUniversalMediaEmbed(post.media_url)}<a href="${esc(post.media_url)}" target="_blank" download class="block w-full py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-center text-xs font-extrabold">⬇️ تحميل ملف الفيديو / الصورة لرفعه</a></div>` : ''}
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <button type="button" onclick="crossPostToApp('${esc(post.id)}','facebook')" class="py-3 px-3 rounded-xl bg-blue-600/25 border border-blue-400/50 text-blue-200 text-xs font-extrabold hover:bg-blue-600/40 flex items-center justify-center gap-2">📘 نشر في Facebook ↗</button>
+            <button type="button" onclick="crossPostToApp('${esc(post.id)}','tiktok')" class="py-3 px-3 rounded-xl bg-emerald-600/25 border border-emerald-400/50 text-emerald-200 text-xs font-extrabold hover:bg-emerald-600/40 flex items-center justify-center gap-2">🎵 رفع في TikTok Studio ↗</button>
+            <button type="button" onclick="crossPostToApp('${esc(post.id)}','instagram')" class="py-3 px-3 rounded-xl bg-pink-600/25 border border-pink-400/50 text-pink-200 text-xs font-extrabold hover:bg-pink-600/40 flex items-center justify-center gap-2">📸 نشر في Instagram ↗</button>
+            <button type="button" onclick="crossPostToApp('${esc(post.id)}','youtube')" class="py-3 px-3 rounded-xl bg-rose-600/25 border border-rose-400/50 text-rose-200 text-xs font-extrabold hover:bg-rose-600/40 flex items-center justify-center gap-2">▶️ رفع في YouTube Studio ↗</button>
+          </div>
+          <button type="button" onclick="crossPostToApp('${esc(post.id)}','all')" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold shadow-lg">🔥 فتح جميع البرامج (فيسبوك + تيك توك + إنستقرام + يوتيوب) معاً الآن</button>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
     async function crossPostToApp(postId, app) {
       const p = cachedMarketingPosts.find(x => x.id === postId);
       if (!p) return;
-      const fullText = [p.title || '', p.body || '', p.hashtags || '', p.link_url || ''].filter(Boolean).join('\n\n');
+      const fullText = [p.title || '', (p.body || '').replace(/🎬\s*https?:\/\/\S+/g, '').trim(), p.hashtags || '', p.link_url || ''].filter(Boolean).join('\n\n');
       const shareUrl = p.media_url || p.link_url || 'https://mgdtrading.vercel.app/';
       try {
         if (navigator.clipboard) await navigator.clipboard.writeText(fullText);
       } catch {}
 
+      if (app === 'all') {
+        showToast('📋 تم نسخ الوصف! جاري فتح فيسبوك وتيك توك وإنستقرام ويوتيوب...');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(fullText)}`, '_blank');
+        window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
+        window.open('https://www.instagram.com/', '_blank');
+        window.open('https://studio.youtube.com/', '_blank');
+        return;
+      }
       if (app === 'native' && navigator.share) {
         try {
           await navigator.share({ title: p.title || 'MGD Trading', text: fullText, url: shareUrl });
@@ -1363,6 +1412,7 @@
         cachedSocialAccounts = validAccounts;
         cachedMarketingPosts = d.posts || [];
         cleanInvalidSocialAccounts(d.accounts || []);
+        syncPublishedMediaToStorefront(cachedMarketingPosts);
         if ($('socialAccountsList')) {
           $('socialAccountsList').innerHTML = validAccounts.map(a => {
             let hasApi = false;
@@ -1516,11 +1566,7 @@
         }, cachedSocialAccounts);
 
         // Sync published media posts to cms_config ('media_posts') so the public storefront displays them immediately
-        try {
-          const allPosts = await api('GET', '/api/marketing/posts');
-          const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
-          await api('PUT', '/api/cms/config', { key: 'media_posts', status: 'published', value: pubList });
-        } catch {}
+        await syncPublishedMediaToStorefront();
 
         $('marketingPostForm').reset();
         selectedMkMediaB64 = null;
@@ -1528,7 +1574,11 @@
         $('mkMediaPreviewBox').classList.add('hidden');
         $('mkMediaPreviewBox').innerHTML = '';
         showToast(finalStatus === 'published' ? '🚀 تم رفع ونشر الوسائط فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
-        loadMarketing();
+        await loadMarketing();
+        if (finalStatus === 'published' && res?.id) {
+          const justPublished = cachedMarketingPosts.find(x => x.id === res.id) || { id: res.id, title: titleVal, body: bodyText, hashtags: '#MGD_Trading', link_url: 'https://mgdtrading.vercel.app/#store', media_url: mediaUrl };
+          openMultiPlatformPublisherModal(justPublished);
+        }
       } catch (err) {
         showToast('❌ خطأ أثناء النشر: ' + err.message, true);
       } finally {
@@ -1553,13 +1603,13 @@
           const targetPost = cachedMarketingPosts.find(x => x.id === id);
           if (targetPost) await runClientSideMultiPlatformDispatch(targetPost, cachedSocialAccounts);
         }
-        try {
-          const allPosts = await api('GET', '/api/marketing/posts');
-          const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
-          await api('PUT', '/api/cms/config', { key: 'media_posts', status: 'published', value: pubList });
-        } catch {}
+        await syncPublishedMediaToStorefront();
         showToast('🚀 تم تنفيذ الإجراء والنشر بنجاح!');
-        loadMarketing();
+        await loadMarketing();
+        if (act === 'publish') {
+          const targetPost = cachedMarketingPosts.find(x => x.id === id);
+          if (targetPost) openMultiPlatformPublisherModal(targetPost);
+        }
       }
       catch (e) { showToast(e.message, true); }
     }
