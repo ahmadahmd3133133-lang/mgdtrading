@@ -1235,23 +1235,71 @@
       const origText = btn ? btn.textContent : '';
       if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري رفع ونشر المحتوى...'; }
       try {
+        let mediaUrl = $('mkMediaUrl').value.trim();
+        // If user selected a file, upload it via /api/products (or mediaBase64) so it works on both v3.0 and v3.1 workers
+        if (selectedMkMediaB64 && !mediaUrl) {
+          try {
+            const up = await api('POST', '/api/products', {
+              id: '_media_asset_temp',
+              name: ($('mkTitle').value.trim() || 'MGD_Media'),
+              price: 0,
+              desc: 'Media upload',
+              imageBase64: selectedMkMediaB64,
+              imageExt: selectedMkMediaExt,
+            });
+            if (up?.product?.image) {
+              mediaUrl = up.product.image.replace(/^\.\//, 'https://mgdtrading.vercel.app/');
+              await api('DELETE', '/api/products/_media_asset_temp').catch(() => {});
+            }
+          } catch {}
+        }
+
+        const chosenStatus = $('mkStatus').value;
+        const wantsImmediatePublish = chosenStatus === 'publish_now';
+        const target_channel = $('mkTargetChannel')?.value.trim() || '';
+        if (target_channel) {
+          await api('POST', '/api/marketing/accounts', {
+            platform: 'telegram',
+            account_name: target_channel,
+            channel_id: target_channel,
+          }).catch(() => {});
+        }
+
+        let bodyText = $('mkBody').value.trim();
+        if (mediaUrl && !bodyText.includes(mediaUrl)) {
+          bodyText = `${bodyText}\n\n🎬 ${mediaUrl}`.trim();
+        }
+
         const res = await api('POST', '/api/marketing/posts', {
           title: $('mkTitle').value.trim(),
-          body: $('mkBody').value.trim(),
+          body: bodyText,
           hashtags: $('mkTags').value.trim(),
           link_url: $('mkLink').value.trim(),
-          media_url: $('mkMediaUrl').value.trim(),
-          ...(selectedMkMediaB64 ? { mediaBase64: selectedMkMediaB64, mediaExt: selectedMkMediaExt } : {}),
-          target_channel: $('mkTargetChannel')?.value.trim() || '',
+          media_url: mediaUrl,
+          target_channel,
           platforms,
           scheduled_at: $('mkSchedule').value || null,
-          status: $('mkStatus').value,
+          status: wantsImmediatePublish ? 'approved' : chosenStatus,
         });
+
+        let finalStatus = res.status;
+        if (wantsImmediatePublish && res.id && res.status !== 'published') {
+          const pubRes = await api('POST', `/api/marketing/posts/${encodeURIComponent(res.id)}/publish`, { target_channel });
+          if (pubRes?.status) finalStatus = pubRes.status;
+        }
+
+        // Also sync published media posts to cms_config ('media_posts') so the public storefront displays them immediately
+        try {
+          const allPosts = await api('GET', '/api/marketing/posts');
+          const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
+          await api('PUT', '/api/cms/config', { key: 'media_posts', status: 'published', value: pubList });
+        } catch {}
+
         $('marketingPostForm').reset();
         selectedMkMediaB64 = null;
         $('mkMediaPreviewBox').classList.add('hidden');
         $('mkMediaPreviewBox').innerHTML = '';
-        showToast(res.status === 'published' ? '🚀 تم نشر الفيديو/المنشور فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
+        showToast(finalStatus === 'published' ? '🚀 تم نشر الفيديو/المنشور فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
         loadMarketing();
       } catch (err) { showToast(err.message, true); }
       finally { if (btn) { btn.disabled = false; btn.textContent = origText; } }
@@ -1260,7 +1308,19 @@
     async function actMarketingPost(id, act) {
       const target_channel = $('mkTargetChannel')?.value.trim() || '';
       if (act === 'publish' && !confirm('تأكيد النشر الفوري للمنشور/الفيديو على القناة والمنصات المحددة؟')) return;
-      try { await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`, { target_channel }); showToast('🚀 تم تنفيذ الإجراء والنشر بنجاح!'); loadMarketing(); }
+      try {
+        if (act === 'publish' && target_channel) {
+          await api('POST', '/api/marketing/accounts', { platform: 'telegram', account_name: target_channel, channel_id: target_channel }).catch(() => {});
+        }
+        await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`, { target_channel });
+        try {
+          const allPosts = await api('GET', '/api/marketing/posts');
+          const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
+          await api('PUT', '/api/cms/config', { key: 'media_posts', status: 'published', value: pubList });
+        } catch {}
+        showToast('🚀 تم تنفيذ الإجراء والنشر بنجاح!');
+        loadMarketing();
+      }
       catch (e) { showToast(e.message, true); }
     }
 
@@ -1437,18 +1497,35 @@
     $('signalForm').addEventListener('submit', async e => {
       e.preventDefault();
       try {
+        const sym = $('sigSymbol').value.trim();
+        const dir = $('sigDir').value;
+        const ent = $('sigEntry').value.trim();
+        const sl = $('sigSl').value.trim();
+        const tp1 = $('sigTp1').value.trim();
+        const tf = $('sigTf').value.trim();
         await api('POST', '/api/signals', {
-          symbol: $('sigSymbol').value.trim(),
-          direction: $('sigDir').value,
-          entry_price: $('sigEntry').value.trim(),
-          stop_loss: $('sigSl').value.trim(),
-          tp1: $('sigTp1').value.trim(),
-          timeframe: $('sigTf').value.trim(),
+          symbol: sym,
+          direction: dir,
+          entry_price: ent,
+          stop_loss: sl,
+          tp1: tp1,
+          timeframe: tf,
           status: $('sigStatus').value,
           result_pips: Number($('sigPips').value || 0),
         });
+        // Broadcast to Telegram channel & groups
+        try {
+          const p = await api('POST', '/api/marketing/posts', {
+            title: `📡 إشارة تداول مباشرة: ${sym} (${dir})`,
+            body: `🪙 الزوج: ${sym} (${tf})\n📊 الاتجاه: ${dir === 'BUY' ? '🟢 BUY (شراء)' : '🔴 SELL (بيع)'}\n🎯 الدخول: ${ent}\n🛡️ الوقف SL: ${sl || '-'}\n💰 الهدف TP1: ${tp1 || '-'}`,
+            link_url: 'https://mgdtrading.vercel.app/#signals',
+            platforms: ['telegram'],
+            status: 'approved',
+          });
+          if (p?.id) await api('POST', `/api/marketing/posts/${encodeURIComponent(p.id)}/publish`);
+        } catch {}
         $('signalForm').reset();
-        showToast('✅ تم نشر الإشارة على الموقع!');
+        showToast('✅ تم نشر الإشارة على الموقع وإرسالها للقناة!');
         loadSignals();
       } catch (err) { showToast(err.message, true); }
     });
@@ -1476,16 +1553,35 @@
     $('academyForm').addEventListener('submit', async e => {
       e.preventDefault();
       try {
+        const num = $('acNum').value.trim();
+        const cat = $('acCat').value.trim();
+        const title = $('acTitle').value.trim();
+        const desc = $('acDesc').value.trim();
+        const video_url = $('acVideo').value.trim();
+        const sendToChannel = Boolean($('acSendChannel')?.checked);
         await api('POST', '/api/academy', {
-          num: $('acNum').value.trim(),
-          category: $('acCat').value.trim(),
-          title: $('acTitle').value.trim(),
-          description: $('acDesc').value.trim(),
-          video_url: $('acVideo').value.trim(),
-          sendToChannel: Boolean($('acSendChannel')?.checked),
+          num,
+          category: cat,
+          title,
+          description: desc,
+          video_url,
+          sendToChannel,
         });
+        if (sendToChannel) {
+          try {
+            const p = await api('POST', '/api/marketing/posts', {
+              title: `🎓 درس جديد في أكاديمية MGD: ${title}`,
+              body: `${desc}${video_url ? `\n\n🎬 رابط الفيديو: ${video_url}` : ''}`,
+              media_url: video_url,
+              link_url: 'https://mgdtrading.vercel.app/#academy',
+              platforms: ['telegram', 'website'],
+              status: 'approved',
+            });
+            if (p?.id) await api('POST', `/api/marketing/posts/${encodeURIComponent(p.id)}/publish`);
+          } catch {}
+        }
         $('academyForm').reset();
-        showToast('✅ تم نشر الدرس في الأكاديمية!');
+        showToast('✅ تم نشر الدرس والفيديو في الأكاديمية والقناة!');
         loadAcademy();
       } catch (err) { showToast(err.message, true); }
     });
