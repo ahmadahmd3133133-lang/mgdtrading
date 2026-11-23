@@ -67,6 +67,7 @@
           <button type="button" data-pub-page="store" class="pub-nav-btn hover:text-goldBright transition">المتجر والروبوتات</button>
           <button type="button" data-pub-page="signals" class="pub-nav-btn hover:text-goldBright transition">إشارات التداول</button>
           <button type="button" data-pub-page="academy" class="pub-nav-btn hover:text-goldBright transition">الأكاديمية</button>
+          <button type="button" onclick="document.getElementById('mgdPublicMediaFeed')?.scrollIntoView({behavior:'smooth'})" class="hover:text-goldBright transition text-goldBright font-extrabold">🎬 الفيديوهات والمنشورات</button>
           <button type="button" data-pub-page="agencies" class="pub-nav-btn hover:text-goldBright transition">الوكالات</button>
           <button type="button" data-pub-page="support" class="pub-nav-btn hover:text-goldBright transition">الدعم الفني</button>
         </nav>
@@ -123,6 +124,9 @@
         <div class="space-y-1"><div class="text-goldBright text-lg">🛡️</div><div class="text-xs font-bold text-white">أمان وموثوقية</div></div>
       </div>
     </section>
+
+    <!-- Live Videos & Social Media Feed Section (Prominent right below Hero) -->
+    <section id="mgdPublicMediaFeed" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-2"></section>
 
     <!-- 4 Main Service Cards -->
     <section id="landingCards" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -1908,34 +1912,36 @@
           ? data.mediaPosts
           : (Array.isArray(data.config?.media_posts) ? data.config.media_posts : []);
         if (mediaPostsList.length) {
-          const homePanel = document.getElementById('pubPage-home');
-          if (homePanel) {
-            let feedBox = document.getElementById('mgdPublicMediaFeed');
-            if (!feedBox) {
-              feedBox = document.createElement('section');
-              feedBox.id = 'mgdPublicMediaFeed';
-              feedBox.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8';
-              homePanel.appendChild(feedBox);
-            }
+          const feedBox = document.getElementById('mgdPublicMediaFeed');
+          if (feedBox) {
+            feedBox.classList.remove('hidden');
             feedBox.innerHTML = `
-              <div class="glass-card rounded-3xl p-6 border border-gold/35 space-y-5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="glass-card rounded-3xl p-6 border border-gold/40 space-y-5 shadow-xl shadow-gold/10">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h2 class="text-xl font-extrabold gold-gradient-text">🎬 أحدث الفيديوهات والمنشورات من قناة MGD</h2>
+                    <h2 class="text-xl font-extrabold gold-gradient-text">🎬 أحدث الفيديوهات والمنشورات الرسمية (MGD Media Center)</h2>
                     <p class="text-xs text-slate-400">شروحات، نتائج مباشرة، وفيديوهات من يوتيوب وتيك توك وفيسبوك وإنستقرام وتيليجرام</p>
                   </div>
-                  <a href="https://t.me/forxvipaml" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 text-xs font-extrabold">انضم لقناة تيليجرام ↗</a>
+                  <div class="flex flex-wrap gap-2">
+                    <a href="https://t.me/forxvipaml" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 text-xs font-extrabold">✈️ قناة التليجرام ↗</a>
+                    <a href="https://www.facebook.com/share/1E6B8SHME5/" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/50 text-blue-300 text-xs font-extrabold">📘 فيسبوك ↗</a>
+                    <a href="https://www.instagram.com/jellyfish.71808288" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-pink-500/20 border border-pink-400/50 text-pink-300 text-xs font-extrabold">📸 إنستقرام ↗</a>
+                    <a href="https://www.tiktok.com/@lialmjtgfffffdf" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-extrabold">🎵 تيك توك ↗</a>
+                  </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   ${mediaPostsList.map(mp => `
-                    <div class="p-4 rounded-2xl bg-obsidian/85 border border-slate-800 flex flex-col justify-between space-y-3">
+                    <div class="p-4 rounded-2xl bg-obsidian/90 border border-gold/25 flex flex-col justify-between space-y-3">
                       <div class="space-y-2.5">
                         ${mp.media_url ? renderPublicMediaEmbed(mp.media_url) : ''}
                         ${mp.title ? `<h3 class="text-sm font-extrabold text-white">${escHtml(mp.title)}</h3>` : ''}
-                        ${mp.body ? `<p class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">${escHtml(mp.body)}</p>` : ''}
+                        ${mp.body ? `<p class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">${escHtml(mp.body.replace(/🎬\s*https?:\/\/\S+/g, '').trim())}</p>` : ''}
                         ${mp.hashtags ? `<div class="text-[11px] text-goldBright font-mono">${escHtml(mp.hashtags)}</div>` : ''}
                       </div>
-                      ${mp.link_url ? `<a href="${escHtml(mp.link_url)}" target="_blank" rel="noopener" class="w-full py-2 rounded-xl bg-gold/15 border border-gold/40 text-goldBright text-center text-xs font-bold hover:bg-gold/25 transition">عرض الرابط / التفاصيل ↗</a>` : ''}
+                      <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-800">
+                        ${mp.media_url ? `<a href="${escHtml(mp.media_url)}" target="_blank" rel="noopener" download class="flex-1 py-1.5 px-2 rounded-lg bg-gold text-obsidian text-center text-[11px] font-extrabold">⬇️ فتح / تحميل الفيديو</a>` : ''}
+                        ${mp.link_url ? `<a href="${escHtml(mp.link_url)}" target="_blank" rel="noopener" class="flex-1 py-1.5 px-2 rounded-lg bg-gold/15 border border-gold/40 text-goldBright text-center text-[11px] font-bold">🔗 المتجر ↗</a>` : ''}
+                      </div>
                     </div>
                   `).join('')}
                 </div>
