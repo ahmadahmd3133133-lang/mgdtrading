@@ -355,17 +355,24 @@
               <!-- Universal Video / Media URL Input + Instant Preview -->
               <div class="p-3 rounded-xl bg-navyLight/60 border border-gold/30 space-y-2">
                 <label class="block text-xs font-extrabold text-goldBright">🎬 رابط فيديو من أي برنامج (YouTube / TikTok / Facebook / Instagram / MP4) أو رابط صورة</label>
-                <input id="mkMediaUrl" type="url" oninput="previewMarketingMedia()" class="input-field text-xs font-mono" placeholder="https://www.youtube.com/watch?v=... أو تيك توك / فيسبوك / انستقرام" dir="ltr" />
-                <div class="flex items-center justify-between gap-2 pt-1">
-                  <label class="text-[11px] text-slate-300 font-bold">🖼️ أو ارفع صورة / فيديو قصير من جهازك:</label>
-                  <input id="mkMediaFile" type="file" accept="image/*,video/mp4,video/webm,.pdf,.zip,.ex5" class="text-[11px] text-slate-300 max-w-[210px]" />
+                <div class="flex gap-1.5">
+                  <input id="mkMediaUrl" type="text" oninput="previewMarketingMedia()" class="input-field text-xs font-mono" placeholder="الصق رابط يوتيوب / تيك توك / فيسبوك / انستقرام هنا..." dir="ltr" />
+                  <button type="button" onclick="submitMarketingPostNow()" class="px-3 py-1.5 rounded-xl bg-gold text-obsidian text-xs font-extrabold shrink-0">🚀 نشر الرابط</button>
                 </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <label class="text-[11px] text-slate-300 font-bold">🖼️ أو اختر صورة / فيديو / ملف من جهازك:</label>
+                  <input id="mkMediaFile" type="file" accept="image/*,video/*,.mp4,.webm,.mov,.pdf,.zip,.rar,.ex5,.ex4" class="text-[11px] text-slate-300 max-w-[220px]" />
+                </div>
+                <label class="flex items-center gap-1.5 text-[11px] text-emerald-300 font-bold pt-0.5">
+                  <input id="mkAutoPublishOnFile" type="checkbox" checked class="accent-gold" />
+                  ⚡ نشر مباشر تلقائياً فور اختيار ملف الوسائط من الجهاز
+                </label>
                 <div id="mkMediaPreviewBox" class="hidden pt-2"></div>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">نص المنشور / الوصف *</label>
-                <textarea id="mkBody" rows="3" required class="input-field" placeholder="اكتب نص المنشور أو شرح الفيديو..."></textarea>
+                <label class="block text-xs font-bold text-slate-300 mb-1">نص المنشور / الوصف (اختياري عند رفع وسائط أو فيديو)</label>
+                <textarea id="mkBody" rows="3" class="input-field" placeholder="اكتب نص المنشور أو شرح الفيديو (أو اتركه فارغاً للنشر الفوري للوسائط)..."></textarea>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -1064,6 +1071,7 @@
     // --- 4. Marketing & Social Media Center (Universal Video, Image & Channel Publisher) ---
     let selectedMkMediaB64 = null;
     let selectedMkMediaExt = 'png';
+    let selectedMkMediaName = '';
 
     function renderUniversalMediaEmbed(url) {
       const u = String(url || '').trim();
@@ -1113,38 +1121,81 @@
       box.classList.remove('hidden');
     }
 
-    $('mkMediaFile')?.addEventListener('change', e => {
+    function compressMarketingImage(file) {
+      return new Promise((resolve) => {
+        const r = new FileReader();
+        r.onload = () => {
+          if (!file.type.startsWith('image/') || file.type === 'image/gif') {
+            resolve({ b64: String(r.result || '').replace(/^data:[^;]+;base64,/, ''), ext: (file.name.split('.').pop() || 'png').toLowerCase(), dataUrl: r.result });
+            return;
+          }
+          const img = new Image();
+          img.onerror = () => resolve({ b64: String(r.result || '').replace(/^data:[^;]+;base64,/, ''), ext: (file.name.split('.').pop() || 'jpg').toLowerCase(), dataUrl: r.result });
+          img.onload = () => {
+            const maxSide = 1400;
+            let w = img.width, h = img.height;
+            if (w > maxSide || h > maxSide) {
+              if (w >= h) { h = Math.round((h * maxSide) / w); w = maxSide; }
+              else { w = Math.round((w * maxSide) / h); h = maxSide; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            resolve({ b64: dataUrl.replace(/^data:[^;]+;base64,/, ''), ext: 'jpg', dataUrl });
+          };
+          img.src = r.result;
+        };
+        r.readAsDataURL(file);
+      });
+    }
+
+    $('mkMediaFile')?.addEventListener('change', async e => {
       const file = e.target.files?.[0];
       const box = $('mkMediaPreviewBox');
-      if (!file) { selectedMkMediaB64 = null; return; }
-      if (file.size > 15 * 1024 * 1024) {
-        showToast('حجم الملف كبير جداً (الحد الأقصى للرفع المباشر 15MB، أو ضع رابط يوتيوب/تيك توك/فيسبوك)', true);
+      if (!file) { selectedMkMediaB64 = null; selectedMkMediaName = ''; return; }
+      if (file.size > 3.5 * 1024 * 1024 && !file.type.startsWith('image/')) {
+        showToast('⚠️ حجم الفيديو أكبر من 3.5MB (حد الإرسال السحابي المباشر). يرجى رفع الفيديو على يوتيوب/تيك توك/فيسبوك/تيليجرام ولصق رابطه في حقل الرابط أعلاه للنشر الفوري!', true);
         e.target.value = '';
         return;
       }
-      const r = new FileReader();
-      r.onload = () => {
-        selectedMkMediaB64 = String(r.result || '').replace(/^data:[^;]+;base64,/, '');
-        selectedMkMediaExt = (file.name.split('.').pop() || 'png').toLowerCase();
-        if (file.type.startsWith('image/')) {
-          box.innerHTML = `<img src="${r.result}" class="max-h-48 rounded-xl border border-gold/40 mx-auto" />`;
-        } else if (file.type.startsWith('video/')) {
-          box.innerHTML = `<video src="${r.result}" controls class="max-h-48 rounded-xl border border-gold/40 mx-auto"></video>`;
-        } else {
-          box.innerHTML = `<div class="p-2 rounded-lg bg-obsidian text-goldBright font-mono text-xs">📎 ملف جاهز للرفع: ${esc(file.name)}</div>`;
-        }
-        box.classList.remove('hidden');
-      };
-      r.readAsDataURL(file);
+      showToast('⏳ جاري تجهيز ملف الوسائط...');
+      selectedMkMediaName = file.name.replace(/\.[^.]+$/, '');
+      const { b64, ext, dataUrl } = await compressMarketingImage(file);
+      selectedMkMediaB64 = b64;
+      selectedMkMediaExt = ext;
+      if (file.type.startsWith('image/')) {
+        box.innerHTML = `<img src="${dataUrl}" class="max-h-48 rounded-xl border border-gold/40 mx-auto" />`;
+      } else if (file.type.startsWith('video/')) {
+        box.innerHTML = `<video src="${dataUrl}" controls class="max-h-48 rounded-xl border border-gold/40 mx-auto"></video>`;
+      } else {
+        box.innerHTML = `<div class="p-2 rounded-lg bg-obsidian text-goldBright font-mono text-xs">📎 ملف جاهز للرفع: ${esc(file.name)}</div>`;
+      }
+      box.classList.remove('hidden');
+
+      // Auto-publish immediately if checkbox is enabled!
+      if ($('mkAutoPublishOnFile')?.checked) {
+        await submitMarketingPostNow();
+      }
     });
 
     $('socialAccountForm')?.addEventListener('submit', async e => {
       e.preventDefault();
+      const plat = $('saPlatform').value;
+      let cid = $('saChannelId').value.trim();
+      if (plat === 'telegram') {
+        // Normalize t.me/channel links to @channel
+        cid = cid.replace(/^https?:\/\/t\.me\//i, '@');
+        if (!/^(@[a-zA-Z0-9_]{4,}|-?\d{6,})$/.test(cid)) {
+          showToast('⚠️ معرف قناة تيليجرام غير صحيح! يجب أن يبدأ بـ @ باللغة الإنجليزية (مثال: @forxvipaml أو @mgdtrading) أو رقم المعرف -100...', true);
+          return;
+        }
+      }
       try {
         await api('POST', '/api/marketing/accounts', {
-          platform: $('saPlatform').value,
+          platform: plat,
           account_name: $('saName').value.trim(),
-          channel_id: $('saChannelId').value.trim(),
+          channel_id: cid,
         });
         $('socialAccountForm').reset();
         showToast('✅ تم ربط القناة/الحساب بنجاح!');
@@ -1178,11 +1229,27 @@
       } catch (e) { showToast(e.message, true); }
     }
 
+    async function cleanInvalidSocialAccounts(accounts) {
+      for (const a of (accounts || [])) {
+        if (a.platform === 'telegram' && a.channel_id && !/^(@[a-zA-Z0-9_]{4,}|-?\d{6,})$/.test(String(a.channel_id).trim())) {
+          // Replace invalid channel_id in D1 or hide it so it stops breaking Telegram publishing
+          try { await api('DELETE', `/api/marketing/accounts/${encodeURIComponent(a.id)}`); } catch {}
+        }
+      }
+    }
+
     async function loadMarketing() {
       try {
         const d = await api('GET', '/api/marketing/posts');
+        const validAccounts = (d.accounts || []).filter(a => {
+          if (a.platform === 'telegram' && a.channel_id && !/^(@[a-zA-Z0-9_]{4,}|-?\d{6,})$/.test(String(a.channel_id).trim())) {
+            return false;
+          }
+          return true;
+        });
+        cleanInvalidSocialAccounts(d.accounts || []);
         if ($('socialAccountsList')) {
-          $('socialAccountsList').innerHTML = (d.accounts || []).map(a => `
+          $('socialAccountsList').innerHTML = validAccounts.map(a => `
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navyLight border border-gold/30 text-[11px]">
               <strong class="text-goldBright">${esc(a.platform)}</strong>: <span class="text-white">${esc(a.account_name)}</span>
               ${a.channel_id ? `<code class="text-sky-300 font-mono">(${esc(a.channel_id)})</code>` : ''}
@@ -1195,7 +1262,14 @@
           try {
             const logs = JSON.parse(p.publish_log_json || '[]');
             if (Array.isArray(logs) && logs.length) {
-              logsHtml = `<div class="flex flex-wrap gap-1.5 pt-1">${logs.map(l => `<span class="px-2 py-0.5 rounded text-[10px] ${l.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'}">${esc(l.platform)} ${l.target ? `(${esc(l.target)})` : ''}: ${esc(l.note || (l.ok ? 'تم النشر' : 'تنبيه'))}</span>`).join('')}</div>`;
+              logsHtml = `<div class="flex flex-wrap gap-1.5 pt-1">${logs.map(l => {
+                const isEmbedPlatform = ['website', 'youtube', 'tiktok', 'facebook', 'instagram'].includes(l.platform);
+                const ok = l.ok || (isEmbedPlatform && p.status === 'published');
+                const note = isEmbedPlatform && p.status === 'published'
+                  ? `تم النشر والتضمين في الموقع (${l.platform})`
+                  : (l.note || (ok ? 'تم النشر بنجاح ✅' : 'تأكد أن البوت مشرف في القناة'));
+                return `<span class="px-2 py-0.5 rounded text-[10px] ${ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'}">${esc(l.platform)} ${l.target ? `(${esc(l.target)})` : ''}: ${esc(note)}</span>`;
+              }).join('')}</div>`;
             }
           } catch {}
           return `
@@ -1228,56 +1302,71 @@
       } catch (e) { showToast(e.message, true); }
     }
 
-    $('marketingPostForm').addEventListener('submit', async e => {
-      e.preventDefault();
+    async function submitMarketingPostNow() {
       const platforms = Array.from(document.querySelectorAll('.mk-plat:checked')).map(c => c.value);
       const btn = $('mkSubmitBtn');
-      const origText = btn ? btn.textContent : '';
-      if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري رفع ونشر المحتوى...'; }
+      const origText = btn ? btn.textContent : '🚀 تنفيذ وحفظ المنشور / الفيديو الآن';
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري رفع ونشر الوسائط...'; }
       try {
         let mediaUrl = $('mkMediaUrl').value.trim();
-        // If user selected a file, upload it via /api/products (or mediaBase64) so it works on both v3.0 and v3.1 workers
-        if (selectedMkMediaB64 && !mediaUrl) {
-          try {
-            const up = await api('POST', '/api/products', {
-              id: '_media_asset_temp',
-              name: ($('mkTitle').value.trim() || 'MGD_Media'),
-              price: 0,
-              desc: 'Media upload',
-              imageBase64: selectedMkMediaB64,
-              imageExt: selectedMkMediaExt,
-            });
-            if (up?.product?.image) {
-              mediaUrl = up.product.image.replace(/^\.\//, 'https://mgdtrading.vercel.app/');
-              await api('DELETE', '/api/products/_media_asset_temp').catch(() => {});
-            }
-          } catch {}
-        }
+        const titleVal = $('mkTitle').value.trim() || selectedMkMediaName || 'منشور MGD الرسمي';
 
-        const chosenStatus = $('mkStatus').value;
-        const wantsImmediatePublish = chosenStatus === 'publish_now';
-        const target_channel = $('mkTargetChannel')?.value.trim() || '';
-        if (target_channel) {
-          await api('POST', '/api/marketing/accounts', {
-            platform: 'telegram',
-            account_name: target_channel,
-            channel_id: target_channel,
-          }).catch(() => {});
+        // Upload selected media file to GitHub via /api/products if present
+        if (selectedMkMediaB64 && !mediaUrl) {
+          showToast('☁️ جاري رفع ملف الوسائط إلى السحابة...');
+          const up = await api('POST', '/api/products', {
+            id: '_media_asset_temp',
+            name: titleVal,
+            price: 0,
+            desc: 'Media upload',
+            imageBase64: selectedMkMediaB64,
+            imageExt: selectedMkMediaExt,
+          });
+          if (up?.product?.image) {
+            mediaUrl = up.product.image.replace(/^\.\//, 'https://mgdtrading.vercel.app/');
+            await api('DELETE', '/api/products/_media_asset_temp').catch(() => {});
+          } else {
+            throw new Error('تعذر رفع ملف الوسائط، يرجى المحاولة مرة أخرى.');
+          }
         }
 
         let bodyText = $('mkBody').value.trim();
+        if (!bodyText && !mediaUrl) {
+          showToast('⚠️ يرجى إدخال رابط فيديو/صورة أو اختيار ملف وسائط أو كتابة نص المنشور.', true);
+          return;
+        }
+        if (!bodyText) {
+          bodyText = titleVal;
+        }
         if (mediaUrl && !bodyText.includes(mediaUrl)) {
           bodyText = `${bodyText}\n\n🎬 ${mediaUrl}`.trim();
         }
 
+        const chosenStatus = $('mkStatus').value;
+        const wantsImmediatePublish = chosenStatus === 'publish_now';
+        let target_channel = $('mkTargetChannel')?.value.trim() || '';
+        if (target_channel) {
+          target_channel = target_channel.replace(/^https?:\/\/t\.me\//i, '@');
+          if (/^(@[a-zA-Z0-9_]{4,}|-?\d{6,})$/.test(target_channel)) {
+            await api('POST', '/api/marketing/accounts', {
+              platform: 'telegram',
+              account_name: target_channel,
+              channel_id: target_channel,
+            }).catch(() => {});
+          } else {
+            showToast('⚠️ تجاهلنا معرف القناة الإضافي لأنه غير صالح (يجب أن يبدأ بـ @ مثل @forxvipaml)', true);
+            target_channel = '';
+          }
+        }
+
         const res = await api('POST', '/api/marketing/posts', {
-          title: $('mkTitle').value.trim(),
+          title: titleVal,
           body: bodyText,
-          hashtags: $('mkTags').value.trim(),
+          hashtags: $('mkTags').value.trim() || '#MGD_Trading',
           link_url: $('mkLink').value.trim(),
           media_url: mediaUrl,
           target_channel,
-          platforms,
+          platforms: platforms.length ? platforms : ['website', 'telegram'],
           scheduled_at: $('mkSchedule').value || null,
           status: wantsImmediatePublish ? 'approved' : chosenStatus,
         });
@@ -1288,7 +1377,7 @@
           if (pubRes?.status) finalStatus = pubRes.status;
         }
 
-        // Also sync published media posts to cms_config ('media_posts') so the public storefront displays them immediately
+        // Sync published media posts to cms_config ('media_posts') so the public storefront displays them immediately
         try {
           const allPosts = await api('GET', '/api/marketing/posts');
           const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
@@ -1297,12 +1386,21 @@
 
         $('marketingPostForm').reset();
         selectedMkMediaB64 = null;
+        selectedMkMediaName = '';
         $('mkMediaPreviewBox').classList.add('hidden');
         $('mkMediaPreviewBox').innerHTML = '';
-        showToast(finalStatus === 'published' ? '🚀 تم نشر الفيديو/المنشور فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
+        showToast(finalStatus === 'published' ? '🚀 تم رفع ونشر الوسائط فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
         loadMarketing();
-      } catch (err) { showToast(err.message, true); }
-      finally { if (btn) { btn.disabled = false; btn.textContent = origText; } }
+      } catch (err) {
+        showToast('❌ خطأ أثناء النشر: ' + err.message, true);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = origText; }
+      }
+    }
+
+    $('marketingPostForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await submitMarketingPostNow();
     });
 
     async function actMarketingPost(id, act) {
