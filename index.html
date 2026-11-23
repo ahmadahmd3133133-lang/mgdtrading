@@ -1557,6 +1557,7 @@
                 <div><span class="text-slate-400 block">السعر</span><strong class="text-goldBright font-mono">${p.oldPrice ? `<span class="text-[11px] text-slate-400 line-through font-mono mr-1">$${Number(p.oldPrice).toLocaleString('en-US')}</span>` : ''}${(p.price === null || p.price === undefined || p.price === '') ? escHtml(p.priceLabel || 'حسب الاتفاق') : (isFree ? 'مجاني' : '$' + Number(p.price).toLocaleString('en-US'))}</strong></div>
               </div>
               ${feats}
+              ${p.videoUrl ? `<div class="pt-2 space-y-1.5"><div class="text-xs font-extrabold text-goldBright">🎬 فيديو شرح المنتج:</div>${typeof renderPublicMediaEmbed === 'function' ? renderPublicMediaEmbed(p.videoUrl) : `<a href="${escHtml(p.videoUrl)}" target="_blank" class="text-goldBright underline text-xs">مشاهدة الفيديو ↗</a>`}</div>` : ''}
               ${p.fileName ? `<div class="text-xs text-slate-400">ملف المنتج: <code class="text-goldBright font-mono">${escHtml(p.fileName)}</code></div>` : ''}
               <div class="flex flex-wrap gap-3 pt-2">
                 <button type="button" data-order-product="${escHtml(p.name)}" data-order-product-id="${escHtml(p.id)}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">${hasSavedOrder ? 'متابعة طلبك / تحميل المنتج' : 'شراء المنتج الآن'}</button>
@@ -1812,24 +1813,200 @@
 
   <script>
     const MGD_ACADEMY_LESSONS = [{"num": "01", "cat": "مفهوم تداول", "title": "السيولة الذكية وهيكل السوق", "desc": "يشرح أركان هيكل السوق (BOS و CHoCH) ومناطق تجمعات السيولة (BSL/SSL) ولماذا تتحرك الأسعار نحو السيولة."}, {"num": "02", "cat": "مفهوم تداول", "title": "رياضيات إدارة المخاطر", "desc": "يوضح قاعدة التراجع (Drawdown Math) وأهمية الإغلاق الجزئي ونقطة التعادل وملاحقة الأرباح لحماية الرصيد."}, {"num": "03", "cat": "استراتيجية عملية", "title": "استراتيجية السكالبنج المؤسسي", "desc": "يشرح دمج 3 متوسطات (EMA 20/50/200) مع كسر الهيكل CHoCH وإغلاق 70% عند 200 نقطة."}, {"num": "04", "cat": "استراتيجية عملية", "title": "استراتيجية التوافق متعدد الفريمات", "desc": "يشرح خطوات توحيد القرار بين H4 وM15 وM5 عبر EMA وRSI ونقاط الارتكاز."}, {"num": "05", "cat": "إعلان رسمي", "title": "تداول بلا مشاعر... على مدار الساعة", "desc": "إعلان تعريفي يبرز مزايا روبوتات MT5 ومؤشرات TradingView وخدمة البرمجة الخاصة من MGD."}, {"num": "06", "cat": "إعلان رسمي", "title": "منظومة MGD الشاملة للمتداولين", "desc": "إعلان يجمع قناة الـ VIP المجانية لعملاء الـ IB مع أكاديمية SMC ومتجر الخبراء."}, {"num": "07", "cat": "مفهوم تداول", "title": "الأوردر بلوك وفجوات القيمة العادلة", "desc": "يشرح كيفية رصد الأوردر بلوك وFVG وربط الفريم الكبير بتأكيد الفريم الصغير."}, {"num": "08", "cat": "مفهوم تداول", "title": "توقيت الجلسات وسيولة الذهب", "desc": "يوضح خريطة السيولة اليومية بين آسيا ولندن وتداخل نيويورك وأهمية فلاتر التوقيت."}, {"num": "09", "cat": "استراتيجية عملية", "title": "استراتيجية اختراق النطاقات بفلترة السيولة", "desc": "يشرح آلية قنص الاختراق الحقيقي وتفادي الكسر الكاذب وتأمين الأرباح بعد الانطلاق."}, {"num": "10", "cat": "استراتيجية عملية", "title": "استراتيجية الانحدار الخطي والفجوات", "desc": "يوضح توظيف معادلة الانحدار الخطي ورصد الفجوات السعرية (Gaps) لقراءة مسار الذهب."}, {"num": "11", "cat": "إعلان رسمي", "title": "تشكيلة خبراء الذهب من MGD", "desc": "إعلان يستعرض محركات MGD المتخصصة لزوج XAUUSD في السكالبنج والموجات وإدارة الصفقات."}, {"num": "12", "cat": "إعلان رسمي", "title": "حوّل استراتيجيتك إلى روبوت MQL5", "desc": "إعلان يروج لخدمة البرمجة الخاصة من MGD لتحويل الاستراتيجيات اليدوية إلى كود آلي 24/7."}, {"num": "13", "cat": "مفهوم تداول", "title": "السبريد والانزلاق السعري", "desc": "كيف تؤثر تكاليف التنفيذ الخفية على صفقاتك؟ — يشرح الفرق بين سعر العرض والطلب وكيف يحمي فلتر السبريد صفقات السكالبنج."}, {"num": "14", "cat": "مفهوم تداول", "title": "الرافعة المالية والهامش", "desc": "سلاح ذو حدين: كيف تستخدم الرافعة بأمان؟ — يوضح العلاقة بين الرافعة المالية والهامش المتاح ولماذا لا تعني الرافعة العالية مخاطرة عالية إذا انضبط اللوت."}, {"num": "15", "cat": "مفهوم تداول", "title": "تشريح الشموع اليابانية", "desc": "ماذا يخبرك جسم الشمعة والذيل عن صراع المشترين والبائعين؟ — يشرح قراءة نفسية السوق من خلال شكل الشمعة وطول الذيل قبل اتخاذ أي قرار دخول."}, {"num": "16", "cat": "مفهوم تداول", "title": "مناطق الدعم والمقاومة", "desc": "لماذا نرسم مناطق سعرية وليس خطوطاً رفيعة؟ — يوضح لماذا يتفاعل السعر مع مناطق عرض وطلب متكاملة بدلاً من أرقام جامدة."}, {"num": "17", "cat": "مفهوم تداول", "title": "خطوط الترند والقنوات السعرية", "desc": "كيف تحدد مسار السعر وتكتشف لحظة تغيّره؟ — يشرح طريقة رسم خط الاتجاه الصحيح واستغلال القنوات السعرية لتحديد الأهداف."}, {"num": "18", "cat": "مفهوم تداول", "title": "الفرق بين BOS و CHoCH", "desc": "كيف تميز بين استمرار الاتجاه وبداية الانعكاس؟ — يشرح الفرق الجوهري في تحليل المال الذكي بين كسر الهيكل الاستمراري وتغيّر الطابع الانعكاسي."}, {"num": "19", "cat": "مفهوم تداول", "title": "فخاخ السيولة وضرب الستوبات", "desc": "لماذا يضرب السعر وقف خسارتك ثم ينطلق في اتجاهك؟ — يفسر ظاهرة سحب السيولة (Stop Hunt) فوق القمم وتحت القيعان وكيفية تحويلها لصالحك."}, {"num": "20", "cat": "مفهوم تداول", "title": "علاقة الذهب بالدولار والعوائد", "desc": "ما الذي يحرك XAUUSD بعيداً عن التحليل الفني؟ — يشرح الارتباط العكسي غالباً بين الذهب ومؤشر الدولار DXY وعوائد السندات الأمريكية."}, {"num": "21", "cat": "مفهوم تداول", "title": "الأخبار الاقتصادية وتقلبات السوق", "desc": "كيف تتعامل مع أخبار الفائدة والتضخم والوظائف؟ — يوضح مخاطر التداول وقت الأخبار عالية التأثير وكيف تحمي حسابك من الانزلاقات الحادة."}, {"num": "22", "cat": "مفهوم تداول", "title": "حسابات ECN مقابل صناع السوق", "desc": "كيف يؤثر نوع حساب الوسيط على نتائج الروبوت؟ — يشرح الفرق بين التنفيذ المباشر في السوق وحسابات الماركت ميكر وأثره على السكالبنج."}, {"num": "23", "cat": "مفهوم تداول", "title": "الفرق بين الحساب التجريبي والحقيقي", "desc": "لماذا تنجح على الديمو وتتوتر على الحساب الحقيقي؟ — يناقش الفجوة النفسية وتأثير المشاعر والانزلاق السعري عند الانتقال للتداول بأموال حقيقية."}, {"num": "24", "cat": "مفهوم تداول", "title": "حالات السوق: الاتجاه والتذبذب", "desc": "متى تستخدم استراتيجية اتجاهية ومتى تتوقف؟ — يشرح كيف تميز بين السوق الاتجاهي (Trending) والسوق العرضي (Ranging) لاختيار الأداة المناسبة."}, {"num": "25", "cat": "مؤشرات وأدوات", "title": "المتوسطات المتحركة: SMA مقابل EMA", "desc": "أيهما أفضل لاقتناص حركة الذهب السريعة؟ — يقارن بين المتوسط البسيط والمتوسط الأسي وكيفية توظيفهما في الفلترة والدخول."}, {"num": "26", "cat": "مؤشرات وأدوات", "title": "مؤشر RSI والانحراف السعري", "desc": "كيف تكشف ضعف الاتجاه قبل حدوث الانعكاس؟ — يشرح استخدامات القوة النسبية (RSI) ليس فقط للتشبع، بل لاكتشاف الدايفرجنس القوي."}, {"num": "27", "cat": "مؤشرات وأدوات", "title": "مؤشر MACD وقراءة الزخم", "desc": "كيف تقرأ تقاطعات الماكد والهيستوجرام بذكاء؟ — يوضح دور الماكد في تأكيد قوة الاتجاه وفرز الإشارات الضعيفة."}, {"num": "28", "cat": "مؤشرات وأدوات", "title": "مؤشر Stochastic وتوقيت الدخول", "desc": "كيف تستخدم عبور خط الـ 50 لاقتناص الزخم؟ — يشرح طريقة احترافية لاستخدام الستوكاستيك في تأكيد استئناف الاتجاه وليس مجرد التشبع."}, {"num": "29", "cat": "مؤشرات وأدوات", "title": "مؤشر ATR ووقف الخسارة الذكي", "desc": "لماذا يفشل وقف الخسارة الثابت في أسواق متقلبة؟ — يشرح كيف يقيس ATR متوسط المدى الحقيقي لتحديد أهداف ووقف خسارة يتكيف مع تقلب الذهب."}, {"num": "30", "cat": "مؤشرات وأدوات", "title": "مؤشر Parabolic SAR وملاحقة الربح", "desc": "كيف تترك صفقاتك الرابحة تنمو حتى لحظة الانعكاس؟ — يوضح آلية عمل نقاط Parabolic SAR في ملاحقة السعر وتحديد نقطة الخروج الآلي."}, {"num": "31", "cat": "مؤشرات وأدوات", "title": "انفجار البولنجر باند (Squeeze)", "desc": "كيف تتوقع الانفجار السعري القادم قبل حدوثه؟ — يشرح ظاهرة ضيق نطاق بولنجر باند التي تسبق الحركات الانفجارية القوية في الذهب."}, {"num": "32", "cat": "مؤشرات وأدوات", "title": "بروفايل الحجم ونقطة التحكم POC", "desc": "أين تتمركز أكبر كميات التداول المؤسسية؟ — يشرح كيف يكشف Volume Profile مستويات الأسعار التي شهدت أعلى تداول فعلي."}, {"num": "33", "cat": "مؤشرات وأدوات", "title": "نقاط الارتكاز اليومية (Pivots)", "desc": "خارطة طريق جاهزة لمستويات الارتداد اليومية — يوضح كيفية حساب واستخدام نقاط البيفوت (PP, R1, S1) لتحديد مناطق التفاعل السعري."}, {"num": "34", "cat": "مؤشرات وأدوات", "title": "نسب فيبوناتشي الذهبية", "desc": "أين ينتهي التصحيح السعري غالباً؟ — يشرح استخدام مستويات 50% و61.8% و78.6% لتحديد مناطق الدخول مع الاتجاه."}, {"num": "35", "cat": "مؤشرات وأدوات", "title": "الانحدار الخطي والتنبؤ الإحصائي", "desc": "كيف تحسب الخوارزميات ميل السعر رياضياً؟ — يشرح مفهوم Linear Regression Slope المستخدم في التداول الكمي لقياس اتجاه السعر."}, {"num": "36", "cat": "مؤشرات وأدوات", "title": "التحليل متعدد الأطر الزمنية (MTF)", "desc": "لماذا لا يكفي النظر إلى فريم زمني واحد؟ — يشرح منهجية الربط بين الفريم الكبير للاتجاه والفريم الصغير للدخول الدقيق."}, {"num": "37", "cat": "مؤشرات وأدوات", "title": "نماذج السلوك السعري (Price Action)", "desc": "كيف تتداول بدون ازدحام المؤشرات؟ — يشرح أشهر نماذج البرايس أكشن مثل البن بار والابتلاع ونموذج الكسر وإعادة الاختبار."}, {"num": "38", "cat": "مؤشرات وأدوات", "title": "حماية منحنى النمو (Equity Protection)", "desc": "كيف تحافظ على استقرار أرباحك عبر الشهور؟ — يشرح الفرق بين استراتيجية تحقق أرباحاً عشوائية وأخرى تصنع منحنى نمو مستقر ومستدام."}, {"num": "39", "cat": "إدارة المخاطر", "title": "معادلة حساب حجم العقد (Lot Size)", "desc": "كيف تحسب اللوت المثالي لكل صفقة بدقة؟ — يشرح المعادلة الرياضية لربط حجم العقد برصيد الحساب ومسافة وقف الخسارة."}, {"num": "40", "cat": "إدارة المخاطر", "title": "نسبة العائد للمخاطرة (1:2 و 1:3)", "desc": "كيف تربح إجمالاً حتى لو خسرت نصف صفقاتك؟ — يثبت بالأرقام كيف تجعل نسبة العائد إلى المخاطرة حسابك رابحاً حتى بنسبة نجاح 40%."}, {"num": "41", "cat": "إدارة المخاطر", "title": "قاعدة الحد الأقصى للخسارة اليومية", "desc": "صمام الأمان الذي يمنع يوم التداول السيئ من تدمير الحساب — يشرح أهمية وضع سقف للخسارة اليومية (مثلاً 2%–3%) والتوقف التام عند الوصول إليه."}, {"num": "42", "cat": "إدارة المخاطر", "title": "فخ المضاعفات (Martingale) والبديل الذكي", "desc": "لماذا تنهار حسابات المضاعفات العشوائية عند أول موجة قوية؟ — يحذر من مضاعفة اللوت بلا سقف، ويشرح البديل المنضبط بوقف خسارة محدد."}, {"num": "43", "cat": "إدارة المخاطر", "title": "قوة الإغلاق الجزئي (Partial Close)", "desc": "كيف تجمع بين تأمين الربح وملاحقة الأهداف الكبيرة؟ — يشرح تكتيك إغلاق 50% أو 70% من الصفقة عند الهدف الأول وترك الباقي يجري."}, {"num": "44", "cat": "إدارة المخاطر", "title": "متى تنقل الوقف لنقطة الدخول (Breakeven)؟", "desc": "الخطأ الشائع الذي يخرجك من الصفقات الرابحة مبكراً — يوضح التوقيت الصحيح لتفعيل Breakeven دون خنق الصفقة أثناء إعادة الاختبار."}, {"num": "45", "cat": "إدارة المخاطر", "title": "طرق ملاحقة الأرباح (Trailing Stop)", "desc": "مقارنة بين الملاحقة الثابتة، الملاحقة بالهيكل، وبالمتوسطات — يستعرض أفضل 3 طرق لتحريك وقف الخسارة وحماية الأرباح المتراكمة."}, {"num": "46", "cat": "إدارة المخاطر", "title": "دفتر الصفقات وقياس الأداء", "desc": "كيف تحوّل أخطاءك السابقة إلى ميزة تنافسية؟ — يشرح أهمية توثيق الصفقات ومراجعة أرقام الأداء (Win Rate, Profit Factor, Max DD)."}, {"num": "47", "cat": "نفسية المتداول", "title": "التغلب على FOMO والتداول الانتقامي", "desc": "أكبر عدوين لرصيدك: الخوف من فوات الفرصة والانتقام — يناقش أسباب الانفعال النفسي وكيف تقضي الخوارزميات الآلية على هذه السلوكيات."}, {"num": "48", "cat": "نفسية المتداول", "title": "علاج الإفراط في التداول (Overtrading)", "desc": "لماذا قلة الصفقات عالية الجودة تتفوق على كثرة الدخول؟ — يشرح كيف يستهلك الإفراط في التداول السبريد والتركيز الذهني دون عائد حقيقي."}, {"num": "49", "cat": "نفسية المتداول", "title": "عقلية الحفاظ على رأس المال", "desc": "القاعدة الأولى في التداول الاحترافي: احمِ رأس مالك أولاً — يركز على فلسفة MGD الذهبية: الاستمرارية وإدارة المخاطر قبل البحث عن مضاعفة سريعة."}, {"num": "50", "cat": "نفسية المتداول", "title": "كيف تبني خطة تداول متكاملة؟", "desc": "خطوات عملية لصياغة دستورك الشخصي في الأسواق — يلخص العناصر الخمسة التي يجب أن تتضمنها أي خطة تداول ناجحة قبل تشغيلها."}, {"num": "51", "cat": "التداول الخوارزمي", "title": "ما هو خبير التداول الآلي (EA)؟", "desc": "كيف يعمل الروبوت داخل منصة MetaTrader 5 خطوة بخطوة؟ — يشرح للمبتدئين والمستثمرين آلية عمل الـ Expert Advisor وكيف يقرأ الشارت وينفذ الأوامر."}, {"num": "52", "cat": "التداول الخوارزمي", "title": "الباك تست مقابل الاختبار المستقبلي", "desc": "كيف تختبر الروبوت باحترافية وتتجنب خداع التحسين المفرط؟ — يشرح الفرق بين Strategy Tester والتجربة الحية على حساب ديمو (Forward Testing)."}, {"num": "53", "cat": "التداول الخوارزمي", "title": "الماجيك نمبر وإدارة المحفظة الآلية", "desc": "كيف تشغّل عدة روبوتات على حساب واحد دون تداخل؟ — يشرح وظيفة Magic Number في MQL5 لتتبع صفقات كل استراتيجية بشكل مستقل."}, {"num": "54", "cat": "التداول الخوارزمي", "title": "استراتيجيات الشبكة مقابل تتبع الاتجاه", "desc": "مقارنة شاملة بين أسلوب Grid وأسلوب Trend Following — يوضح متى يتفوق كل أسلوب وكيف تُضبط الشبكات الذكية بحدود أمان صارمة."}, {"num": "55", "cat": "التداول الخوارزمي", "title": "استراتيجية العودة للمتوسط (Mean Reversion)", "desc": "كيف تصطاد ارتداد السعر بعد الابتعاد المفرط عن توازنه؟ — يشرح فكرة التوازن السعري وكيف يستفيد المتداول من عودة السعر لمناطق القيمة."}, {"num": "56", "cat": "استراتيجية عملية", "title": "استراتيجية اختراق جلسة لندن", "desc": "خطة عملية لاقتناص انطلاقة السيولة الأوروبية على الذهب — يشرح خطوات تحديد نطاق الجلسة الآسيوية والدخول مع اختراق لندن بفلترة دقيقة."}, {"num": "57", "cat": "استراتيجية عملية", "title": "استراتيجية سكالبنج تداخل نيويورك", "desc": "كيف تستغل أعلى 3 ساعات سيولة في اليوم على XAUUSD؟ — يركز على فترة تداخل لندن ونيويورك وتطبيق شروط سكالبنج سريعة ومنضبطة."}, {"num": "58", "cat": "استراتيجية عملية", "title": "استراتيجية الارتداد من المتوسط (Pullback)", "desc": "كيف تدخل مع الاتجاه القوي بأفضل سعر ممكن؟ — يشرح طريقة انتظار تصحيح السعر نحو EMA 20 أو EMA 50 للدخول مع الموجة الدافعة."}, {"num": "59", "cat": "استراتيجية عملية", "title": "استراتيجية الانعكاس (RSI + S/R)", "desc": "كيف تدمج تشبع المؤشر مع قوة المستوى السعري؟ — يشرح قاعدة ذهبية: لا تبع لمجرد تشبع RSI إلا عند ملامسة مقاومة حقيقية."}, {"num": "60", "cat": "استراتيجية عملية", "title": "استراتيجية التأكيد المزدوج (Dual Engine)", "desc": "لماذا يقلل دمج إشارتين مستقلتين من الصفقات الخاسرة؟ — يشرح فلسفة عدم الاكتفاء بإشارة واحدة، واشتراط تطابق محركين قبل فتح الصفقة."}, {"num": "61", "cat": "التداول الخوارزمي", "title": "أسرار الوسطاء: 2 Digit مقابل 3 Digit", "desc": "لماذا تتعطل بعض الإعدادات على الذهب بين وسيط وآخر؟ — يشرح مشكلة اختلاف الخانات العشرية على XAUUSD وكيف تعالجها MGD برمجياً."}, {"num": "62", "cat": "التداول الخوارزمي", "title": "أهمية السيرفر السحابي (VPS) للروبوتات", "desc": "لماذا لا يجب تشغيل التداول الآلي على جهازك المنزلي فقط؟ — يشرح دور الـ VPS في ضمان استمرارية الاتصال وسرعة التنفيذ 24/7 دون انقطاع الكهرباء أو الإنترنت."}, {"num": "63", "cat": "التداول الخوارزمي", "title": "لماذا تتفوق الخوارزمية على التداول العاطفي؟", "desc": "مقارنة واقعية بين قرارات الإنسان المرهق وقرارات الكود المنضبط — يلخص الفارق الجوهري في الالتزام، السرعة، وتحييد الخوف والطمع."}, {"num": "64", "cat": "التداول الخوارزمي", "title": "تنويع المحفظة وتوزيع المخاطر", "desc": "هل تضع كل رأس مالك على أصل واحد أم توزع الفرص؟ — يشرح كيفية توزيع التداول بين الذهب والأزواج الرئيسية ومراقبة الارتباط."}, {"num": "65", "cat": "إعلان رسمي (MGD)", "title": "رؤية MGD للتقنيات المالية", "desc": "نحن لا نبيع وعوداً... نحن نبيع تكنولوجيا وانضباطاً — إعلان تعريفي بهوية شركة MGD Automated Trading وقيمها في الشفافية والأتمتة."}, {"num": "66", "cat": "إعلان منتج (MGD)", "title": "خبير MGD Aurum Smart Scalper", "desc": "سكالبنج الذهب بذكاء الهيكل السعري وحماية 70% — إعلان مخصص لتسليط الضوء على أقوى خبراء السكالبنج في متجر MGD."}, {"num": "67", "cat": "إعلان منتج (MGD)", "title": "MGD Institutional Trade Control", "desc": "تحكم مؤسسي كامل في صفقاتك وتحليلك لحظياً — إعلان يبرز لوحة التحكم الاحترافية والتحليل متعدد الفريمات في أداة واحدة."}, {"num": "68", "cat": "إعلان منتج (MGD)", "title": "خبير MGD Quantum OmniGold", "desc": "الخوارزمية الكمّية الشاملة لاقتناص موجات الذهب — إعلان لمنتج الفئة العليا المخصص للذهب XAUUSD."}, {"num": "69", "cat": "إعلان منتج (MGD)", "title": "خبير MGD Sovereign Gold X", "desc": "اصطياد الموجات الاتجاهية المستقرة بثبات واحتراف — إعلان ترويجي لخبير الموجات الاتجاهية للذهب والأزواج الرئيسية."}, {"num": "70", "cat": "إعلان منتج (MGD)", "title": "خبير MGD Aurum Vector V2", "desc": "الجيل الثاني من قياس التسارع السعري على الذهب — إعلان يبرز النسخة المطورة V2 المتخصصة في اتجاه الزخم على XAUUSD."}, {"num": "71", "cat": "إعلان منتج (MGD)", "title": "MGD Smart Arabi PRO", "desc": "منظومة التداول الذكي المصممة للمتداول العربي — إعلان يركز على الموثوقية والوضوح في إدارة مناطق العرض والطلب."}, {"num": "72", "cat": "إعلان منتج (MGD)", "title": "خبير MGD TwinEngine V2", "desc": "محركان خوارزميان وتوافق كامل مع وسطاء 2 و3 Digit — إعلان يبرز ميزة التأكيد المزدوج وتعدد النسخ لكل الوسطاء."}, {"num": "73", "cat": "إعلان منتج (MGD)", "title": "خبير MGD Breakout Surge", "desc": "اقتنص لحظة الانفجار السعري بفلترة السيولة الحقيقية — إعلان مخصص لمتداولي الاختراقات السعرية."}, {"num": "74", "cat": "إعلان منتج (MGD)", "title": "خبير MGD TurboScalp V2", "desc": "سرعة تنفيذ فائقة لاقتناص فرص السكالبنج السريعة — إعلان لروبوت السكالبنج السريع V2 على فريمات M1–M15."}, {"num": "75", "cat": "إعلان منتج (MGD)", "title": "لوحة MGD MTF Confluence Radar", "desc": "راقب 6 أطر زمنية في شاشة TradingView واحدة — إعلان لمؤشر لوحة التوافق متعدد الفريمات على TradingView."}, {"num": "76", "cat": "إعلان منتج (MGD)", "title": "مؤشر MGD AI Scalping Pulse", "desc": "مؤشر السكالبنج الشامل بأهداف ATR وفلتر القوة — إعلان لمؤشر السكالبنج الاحترافي على منصة TradingView."}, {"num": "77", "cat": "إعلان خدمة (MGD)", "title": "خدمة البرمجة الخاصة (Custom Coding)", "desc": "حوّل استراتيجيتك اليدوية الناجحة إلى روبوت خاص بك — إعلان مفصل لخدمة برمجة الخبراء والمؤشرات حسب الطلب لدى MGD."}, {"num": "78", "cat": "إعلان خدمة (MGD)", "title": "وكالة الوساطة وقناة الـ VIP الآلية", "desc": "احصل على أقوى التوصيات الآلية مجاناً مدى الحياة — إعلان لنظام الـ IB الذي يتيح للعملاء دخول قناة التوصيات مجاناً عبر فتح حساب تحت وكالة MGD."}, {"num": "79", "cat": "إعلان خدمة (MGD)", "title": "أكاديمية MGD للتحليل المتقدم (SMC)", "desc": "تعلّم أسرار المال الذكي... وطبّقها آلياً — إعلان للدورات التعليمية في تحليل Smart Money Concepts وربطها بالروبوتات."}, {"num": "80", "cat": "إعلان ختامي (MGD)", "title": "موسوعة MGD الشاملة (20 منتجاً احترافياً)", "desc": "كل ما تحتاجه للتداول الخوارزمي في مكان واحد — الفيديو الختامي رقم 80 الذي يجمع كل باقة MGD Automated Trading ويختم السلسلة."}];
+    function renderPublicMediaEmbed(url) {
+      const u = String(url || '').trim();
+      if (!u) return '';
+      const lower = u.toLowerCase().split('?')[0];
+      const ytMatch = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (ytMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black aspect-video"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+      }
+      const ttMatch = u.match(/tiktok\.com\/.*\/video\/(\d+)/);
+      if (ttMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black h-[420px] flex justify-center"><iframe src="https://www.tiktok.com/embed/v2/${ttMatch[1]}" class="w-full max-w-[340px] h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      if (u.includes('tiktok.com')) {
+        return `<div class="p-3 rounded-xl bg-obsidian border border-gold/30 flex items-center justify-between"><span class="text-goldBright font-bold text-xs">🎵 فيديو TikTok</span><a href="${escHtml(u)}" target="_blank" rel="noopener" class="px-3 py-1 rounded-lg bg-gold text-obsidian text-xs font-extrabold">مشاهدة على TikTok ↗</a></div>`;
+      }
+      if (u.includes('facebook.com') || u.includes('fb.watch')) {
+        const enc = encodeURIComponent(u);
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black aspect-video"><iframe src="https://www.facebook.com/plugins/video.php?href=${enc}&show_text=false" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      const igMatch = u.match(/instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+      if (igMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black h-[420px]"><iframe src="https://www.instagram.com/p/${igMatch[1]}/embed" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      if (/\.(mp4|webm|mov|m4v)$/.test(lower)) {
+        return `<video src="${escHtml(u)}" controls class="w-full max-h-80 rounded-xl border border-gold/30 bg-black"></video>`;
+      }
+      if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(lower) || u.includes('/assets/media/') || u.includes('/assets/products/')) {
+        return `<img src="${escHtml(u)}" class="w-full max-h-72 object-contain rounded-xl border border-gold/30 bg-obsidian" onerror="this.style.display='none'" />`;
+      }
+      return `<div class="p-2.5 rounded-xl bg-obsidian border border-slate-700 flex items-center justify-between"><span class="text-slate-300 truncate font-mono text-[11px]">${escHtml(u)}</span><a href="${escHtml(u)}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-gold/20 text-goldBright text-xs font-bold shrink-0">فتح الرابط ↗</a></div>`;
+    }
+
     function renderAcademy(q = '') {
       const grid = document.getElementById('academyGrid');
       if (!grid) return;
       const term = q.trim().toLowerCase();
       const filtered = MGD_ACADEMY_LESSONS.filter(l => !term || (l.title + ' ' + l.cat + ' ' + l.desc).toLowerCase().includes(term));
       grid.innerHTML = filtered.map(l => `
-        <div class="p-3.5 rounded-xl bg-obsidian/80 border border-slate-800 hover:border-gold/40 transition space-y-1.5">
+        <div class="p-3.5 rounded-xl bg-obsidian/80 border border-slate-800 hover:border-gold/40 transition space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="px-2 py-0.5 rounded bg-gold/15 text-goldBright text-[10px] font-bold">${escHtml(l.cat)}</span>
             <span class="font-mono text-[11px] text-slate-400">#${escHtml(l.num)}</span>
           </div>
           <h4 class="text-xs font-extrabold text-white">${escHtml(l.title)}</h4>
           <p class="text-[11px] text-slate-400 leading-relaxed">${escHtml(l.desc)}</p>
+          ${l.video_url ? renderPublicMediaEmbed(l.video_url) : ''}
         </div>
       `).join('');
     }
     document.getElementById('academySearch')?.addEventListener('input', e => renderAcademy(e.target.value));
     renderAcademy();
+
+    // Live CMS, Signals, Academy, Media Posts & Custom Pages sync from MGD Admin Control Center (D1)
+    async function syncPublicCMS() {
+      try {
+        const res = await fetch(`/api/public/cms?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.ok) return;
+
+        // 1) Site settings & section visibility
+        const cfg = data.config?.site_settings;
+        if (cfg) {
+          if (cfg.siteTitle) document.title = cfg.siteTitle;
+          if (cfg.heroTitle) {
+            const h1 = document.querySelector('#landingHero h1');
+            if (h1) h1.textContent = cfg.heroTitle;
+          }
+          if (cfg.heroSubtitle) {
+            const p = document.querySelector('#landingHero p');
+            if (p) p.textContent = cfg.heroSubtitle;
+          }
+          if (cfg.hiddenSections && Array.isArray(cfg.hiddenSections)) {
+            cfg.hiddenSections.forEach(sec => {
+              document.querySelectorAll(`[data-pub-page="${sec}"]`).forEach(el => el.classList.add('hidden'));
+            });
+          }
+        }
+
+        // 2) Merge dynamic Academy lessons (including video_url)
+        if (Array.isArray(data.academyLessons) && data.academyLessons.length) {
+          data.academyLessons.forEach(l => {
+            const entry = { num: l.num || '★', cat: l.category || 'درس جديد', title: l.title, desc: l.description, video_url: l.video_url || '' };
+            const idx = MGD_ACADEMY_LESSONS.findIndex(x => x.title === entry.title);
+            if (idx >= 0) MGD_ACADEMY_LESSONS[idx] = entry;
+            else MGD_ACADEMY_LESSONS.unshift(entry);
+          });
+          renderAcademy(document.getElementById('academySearch')?.value || '');
+        }
+
+        // 3) Render Published Media / Videos / Channel Posts on Home Page
+        if (Array.isArray(data.mediaPosts) && data.mediaPosts.length) {
+          const homePanel = document.getElementById('pubPage-home');
+          if (homePanel) {
+            let feedBox = document.getElementById('mgdPublicMediaFeed');
+            if (!feedBox) {
+              feedBox = document.createElement('section');
+              feedBox.id = 'mgdPublicMediaFeed';
+              feedBox.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8';
+              homePanel.appendChild(feedBox);
+            }
+            feedBox.innerHTML = `
+              <div class="glass-card rounded-3xl p-6 border border-gold/35 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 class="text-xl font-extrabold gold-gradient-text">🎬 أحدث الفيديوهات والمنشورات من قناة MGD</h2>
+                    <p class="text-xs text-slate-400">شروحات، نتائج مباشرة، وفيديوهات من يوتيوب وتيك توك وفيسبوك وإنستقرام وتيليجرام</p>
+                  </div>
+                  <a href="https://t.me/forxvipaml" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 text-xs font-extrabold">انضم لقناة تيليجرام ↗</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  ${data.mediaPosts.map(mp => `
+                    <div class="p-4 rounded-2xl bg-obsidian/85 border border-slate-800 flex flex-col justify-between space-y-3">
+                      <div class="space-y-2.5">
+                        ${mp.media_url ? renderPublicMediaEmbed(mp.media_url) : ''}
+                        ${mp.title ? `<h3 class="text-sm font-extrabold text-white">${escHtml(mp.title)}</h3>` : ''}
+                        ${mp.body ? `<p class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">${escHtml(mp.body)}</p>` : ''}
+                        ${mp.hashtags ? `<div class="text-[11px] text-goldBright font-mono">${escHtml(mp.hashtags)}</div>` : ''}
+                      </div>
+                      ${mp.link_url ? `<a href="${escHtml(mp.link_url)}" target="_blank" rel="noopener" class="w-full py-2 rounded-xl bg-gold/15 border border-gold/40 text-goldBright text-center text-xs font-bold hover:bg-gold/25 transition">عرض الرابط / التفاصيل ↗</a>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        // 3) Render live Trading Signals into #pubPage-signals
+        if (Array.isArray(data.signals) && data.signals.length) {
+          const sigPanel = document.getElementById('pubPage-signals');
+          if (sigPanel) {
+            let box = document.getElementById('liveSignalsDynamicBox');
+            if (!box) {
+              box = document.createElement('div');
+              box.id = 'liveSignalsDynamicBox';
+              box.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6';
+              sigPanel.prepend(box);
+            }
+            box.innerHTML = `
+              <div class="glass-card rounded-2xl p-5 border border-gold/40 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base font-extrabold gold-gradient-text">📡 إشارات التداول المباشرة من غرفة عمليات MGD</h3>
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">مباشر (${data.signals.length})</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  ${data.signals.map(s => `
+                    <div class="p-4 rounded-xl bg-obsidian/85 border border-slate-800 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <span class="font-mono font-extrabold text-white text-sm">${escHtml(s.symbol)} (${escHtml(s.timeframe || 'M15')})</span>
+                        <span class="px-2.5 py-0.5 rounded text-xs font-extrabold ${s.direction === 'BUY' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${escHtml(s.direction)}</span>
+                      </div>
+                      <div class="grid grid-cols-3 gap-2 text-[11px] font-mono bg-navyLight/60 p-2 rounded-lg">
+                        <div><span class="text-slate-400 block">الدخول</span><strong class="text-white">${escHtml(s.entry_price)}</strong></div>
+                        <div><span class="text-slate-400 block">الوقف SL</span><strong class="text-rose-400">${escHtml(s.stop_loss || '-')}</strong></div>
+                        <div><span class="text-slate-400 block">الهدف TP1</span><strong class="text-emerald-400">${escHtml(s.tp1 || '-')}</strong></div>
+                      </div>
+                      <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span>الحالة: <strong class="text-goldBright">${escHtml(s.status)}</strong></span>
+                        ${s.result_pips ? `<span class="font-mono text-emerald-400">${s.result_pips > 0 ? '+' : ''}${escHtml(s.result_pips)} نقطة</span>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        // 4) Custom CMS pages
+        if (Array.isArray(data.pages) && data.pages.length) {
+          const nav = document.querySelector('header nav');
+          const rootView = document.getElementById('publicLandingView');
+          data.pages.forEach(pg => {
+            if (!document.getElementById('pubPage-' + pg.slug) && rootView) {
+              if (nav) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.dataset.pubPage = pg.slug;
+                btn.className = 'pub-nav-btn hover:text-goldBright transition';
+                btn.textContent = pg.title;
+                nav.appendChild(btn);
+              }
+              const sec = document.createElement('div');
+              sec.id = 'pubPage-' + pg.slug;
+              sec.className = 'pub-page-panel hidden max-w-5xl mx-auto px-4 py-10';
+              sec.innerHTML = `<div class="glass-card rounded-3xl p-6 sm:p-8 space-y-4"><h1 class="text-2xl font-extrabold gold-gradient-text">${escHtml(pg.title)}</h1><div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">${escHtml(pg.content?.body || '')}</div></div>`;
+              rootView.appendChild(sec);
+            }
+          });
+        }
+      } catch (e) {}
+    }
+    syncPublicCMS();
   </script>
 </body>
 </html>
