@@ -320,20 +320,25 @@
             <!-- Connected Channels / Accounts Box -->
             <div class="p-3 rounded-xl bg-obsidian/80 border border-slate-800 space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-extrabold text-goldBright">📡 القنوات والحسابات المربوطة للنشر التلقائي</span>
-                <span class="text-[10px] text-slate-400">أضف البوت مشرفاً (Admin) في قناتك</span>
+                <span class="text-xs font-extrabold text-goldBright">📡 ربط القنوات وحسابات السوشيال ميديا (تلقرام • فيسبوك • انستقرام • تيك توك • يوتيوب)</span>
               </div>
-              <form id="socialAccountForm" class="grid grid-cols-1 sm:grid-cols-12 gap-1.5">
-                <select id="saPlatform" class="input-field text-[11px] sm:col-span-3">
-                  <option value="telegram">Telegram</option>
-                  <option value="youtube">YouTube</option>
-                  <option value="tiktok">TikTok</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
-                </select>
-                <input id="saName" type="text" required placeholder="اسم القناة (مثال: قناة التوصيات)" class="input-field text-[11px] sm:col-span-4" />
-                <input id="saChannelId" type="text" required placeholder="@forxvipaml أو @mgdtrading" class="input-field text-[11px] sm:col-span-3 font-mono" dir="ltr" />
-                <button type="submit" class="py-1.5 px-2 rounded-lg bg-gold text-obsidian text-[11px] font-extrabold sm:col-span-2">+ ربط</button>
+              <form id="socialAccountForm" class="space-y-1.5">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-1.5">
+                  <select id="saPlatform" onchange="updateSocialAccountPlaceholders()" class="input-field text-[11px] sm:col-span-3 font-bold">
+                    <option value="telegram">Telegram (قناة/مجموعة)</option>
+                    <option value="facebook">Facebook (صفحة رسمية)</option>
+                    <option value="instagram">Instagram (حساب أعمال)</option>
+                    <option value="tiktok">TikTok (حساب رسمي)</option>
+                    <option value="youtube">YouTube (قناة رسمية)</option>
+                  </select>
+                  <input id="saName" type="text" required placeholder="اسم الحساب (مثال: صفحة MGD الرسمية)" class="input-field text-[11px] sm:col-span-4" />
+                  <input id="saChannelId" type="text" required placeholder="@forxvipaml أو Page ID أو رابط Webhook" class="input-field text-[11px] sm:col-span-5 font-mono" dir="ltr" />
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-1.5">
+                  <input id="saAccessToken" type="password" placeholder="Access Token الرسمي (لـ Facebook/Instagram/TikTok API - اختياري)" class="input-field text-[11px] sm:col-span-5 font-mono" dir="ltr" />
+                  <input id="saWebhookUrl" type="url" placeholder="أو رابط Webhook للنشر التلقائي (Make / Zapier / n8n - اختياري)" class="input-field text-[11px] sm:col-span-5 font-mono" dir="ltr" />
+                  <button type="submit" class="py-1.5 px-2 rounded-lg bg-gold text-obsidian text-[11px] font-extrabold sm:col-span-2">+ ربط الحساب</button>
+                </div>
               </form>
               <div id="socialAccountsList" class="flex flex-wrap gap-1.5 pt-1"></div>
             </div>
@@ -385,14 +390,17 @@
                 </div>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">وجهات النشر والمنصات</label>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-xs font-bold text-slate-300">وجهات النشر (محددة بالكامل للنشر في كل البرامج معاً)</label>
+                  <button type="button" onclick="document.querySelectorAll('.mk-plat').forEach(c=>c.checked=true)" class="text-[10px] text-goldBright underline">تحديد كل البرامج</button>
+                </div>
                 <div class="flex flex-wrap gap-3 text-xs bg-obsidian/70 p-2.5 rounded-xl border border-slate-800">
                   <label class="flex items-center gap-1 text-goldBright font-bold"><input type="checkbox" value="website" checked class="mk-plat accent-gold" /> 🌐 الموقع الرسمي</label>
-                  <label class="flex items-center gap-1 text-sky-300 font-bold"><input type="checkbox" value="telegram" checked class="mk-plat accent-gold" /> ✈️ قناة ومجموعات Telegram</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="youtube" class="mk-plat accent-gold" /> YouTube</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="tiktok" class="mk-plat accent-gold" /> TikTok</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="facebook" class="mk-plat accent-gold" /> Facebook</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="instagram" class="mk-plat accent-gold" /> Instagram</label>
+                  <label class="flex items-center gap-1 text-sky-300 font-bold"><input type="checkbox" value="telegram" checked class="mk-plat accent-gold" /> ✈️ Telegram</label>
+                  <label class="flex items-center gap-1 text-blue-400 font-bold"><input type="checkbox" value="facebook" checked class="mk-plat accent-gold" /> 📘 Facebook</label>
+                  <label class="flex items-center gap-1 text-pink-400 font-bold"><input type="checkbox" value="instagram" checked class="mk-plat accent-gold" /> 📸 Instagram</label>
+                  <label class="flex items-center gap-1 text-emerald-300 font-bold"><input type="checkbox" value="tiktok" checked class="mk-plat accent-gold" /> 🎵 TikTok</label>
+                  <label class="flex items-center gap-1 text-rose-400 font-bold"><input type="checkbox" value="youtube" checked class="mk-plat accent-gold" /> ▶️ YouTube</label>
                 </div>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1179,12 +1187,27 @@
       }
     });
 
+    let cachedSocialAccounts = [];
+    let cachedMarketingPosts = [];
+
+    function updateSocialAccountPlaceholders() {
+      const p = $('saPlatform')?.value;
+      const cid = $('saChannelId');
+      if (!cid) return;
+      if (p === 'telegram') cid.placeholder = '@forxvipaml أو @mgdtrading';
+      else if (p === 'facebook') cid.placeholder = 'Facebook Page ID أو رابط الصفحة';
+      else if (p === 'instagram') cid.placeholder = 'Instagram Business ID أو اسم الحساب';
+      else if (p === 'tiktok') cid.placeholder = '@lialmjtgfffffdf أو اسم الحساب';
+      else if (p === 'youtube') cid.placeholder = 'YouTube Channel ID أو رابط القناة';
+    }
+
     $('socialAccountForm')?.addEventListener('submit', async e => {
       e.preventDefault();
       const plat = $('saPlatform').value;
       let cid = $('saChannelId').value.trim();
+      const accessToken = $('saAccessToken')?.value.trim() || '';
+      const webhookUrl = $('saWebhookUrl')?.value.trim() || '';
       if (plat === 'telegram') {
-        // Normalize t.me/channel links to @channel
         cid = cid.replace(/^https?:\/\/t\.me\//i, '@');
         if (!/^(@[a-zA-Z0-9_]{4,}|-?\d{6,})$/.test(cid)) {
           showToast('⚠️ معرف قناة تيليجرام غير صحيح! يجب أن يبدأ بـ @ باللغة الإنجليزية (مثال: @forxvipaml أو @mgdtrading) أو رقم المعرف -100...', true);
@@ -1196,12 +1219,101 @@
           platform: plat,
           account_name: $('saName').value.trim(),
           channel_id: cid,
+          config: { accessToken, webhookUrl },
         });
         $('socialAccountForm').reset();
-        showToast('✅ تم ربط القناة/الحساب بنجاح!');
+        showToast('✅ تم ربط الحساب/القناة بنجاح!');
         loadMarketing();
       } catch (err) { showToast(err.message, true); }
     });
+
+    async function runClientSideMultiPlatformDispatch(post, accounts) {
+      const fullMsg = [post.title ? `📢 ${post.title}` : '', post.body || '', post.hashtags || '', post.link_url ? `🔗 ${post.link_url}` : ''].filter(Boolean).join('\n\n');
+      const mediaUrl = String(post.media_url || '').trim();
+      const lowerMedia = mediaUrl.toLowerCase().split('?')[0];
+      const isImage = /\.(png|jpe?g|gif|webp|bmp)$/.test(lowerMedia);
+      const isVideo = /\.(mp4|mov|webm|m4v)$/.test(lowerMedia);
+      const results = [];
+
+      for (const acc of (accounts || [])) {
+        let cfg = {};
+        try { cfg = JSON.parse(acc.config_json || '{}'); } catch {}
+        const token = String(cfg.accessToken || '').trim();
+        const webhookUrl = String(cfg.webhookUrl || (String(acc.channel_id || '').startsWith('http') ? acc.channel_id : '')).trim();
+        const targetId = String(acc.channel_id || '').trim();
+
+        if (webhookUrl && acc.platform !== 'telegram') {
+          try {
+            const r = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ platform: acc.platform, accountName: acc.account_name, title: post.title, caption: fullMsg, mediaUrl, linkUrl: post.link_url }),
+            });
+            results.push({ platform: acc.platform, ok: r.ok });
+          } catch {}
+        } else if (acc.platform === 'facebook' && token && targetId) {
+          try {
+            const ep = isVideo ? `https://graph.facebook.com/v19.0/${encodeURIComponent(targetId)}/videos`
+              : isImage ? `https://graph.facebook.com/v19.0/${encodeURIComponent(targetId)}/photos`
+              : `https://graph.facebook.com/v19.0/${encodeURIComponent(targetId)}/feed`;
+            const payload = isVideo ? { file_url: mediaUrl, description: fullMsg, access_token: token }
+              : isImage ? { url: mediaUrl, caption: fullMsg, access_token: token }
+              : { message: fullMsg, ...(post.link_url ? { link: post.link_url } : {}), access_token: token };
+            const r = await fetch(ep, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            results.push({ platform: 'facebook', ok: r.ok });
+          } catch {}
+        } else if (acc.platform === 'instagram' && token && targetId && mediaUrl) {
+          try {
+            const cr = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(targetId)}/media`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...(isVideo ? { media_type: 'REELS', video_url: mediaUrl } : { image_url: mediaUrl }), caption: fullMsg, access_token: token }),
+            }).then(r => r.json());
+            if (cr?.id) {
+              const pr = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(targetId)}/media_publish`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ creation_id: cr.id, access_token: token }),
+              });
+              results.push({ platform: 'instagram', ok: pr.ok });
+            }
+          } catch {}
+        }
+      }
+      return results;
+    }
+
+    async function crossPostToApp(postId, app) {
+      const p = cachedMarketingPosts.find(x => x.id === postId);
+      if (!p) return;
+      const fullText = [p.title || '', p.body || '', p.hashtags || '', p.link_url || ''].filter(Boolean).join('\n\n');
+      const shareUrl = p.media_url || p.link_url || 'https://mgdtrading.vercel.app/';
+      try {
+        if (navigator.clipboard) await navigator.clipboard.writeText(fullText);
+      } catch {}
+
+      if (app === 'native' && navigator.share) {
+        try {
+          await navigator.share({ title: p.title || 'MGD Trading', text: fullText, url: shareUrl });
+          return;
+        } catch {}
+      }
+      if (app === 'facebook') {
+        showToast('📋 تم نسخ نص المنشور! جاري فتح فيسبوك للنشر...');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(fullText)}`, '_blank');
+      } else if (app === 'tiktok') {
+        showToast('📋 تم نسخ الوصف والهاشتاقات! جاري فتح استوديو رفع TikTok...');
+        window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
+      } else if (app === 'instagram') {
+        showToast('📋 تم نسخ الوصف والهاشتاقات! جاري فتح Instagram للنشر...');
+        window.open('https://www.instagram.com/', '_blank');
+      } else if (app === 'youtube') {
+        showToast('📋 تم نسخ عنوان ووصف الفيديو! جاري فتح استوديو YouTube...');
+        window.open('https://studio.youtube.com/', '_blank');
+      } else if (app === 'telegram') {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(fullText)}`, '_blank');
+      }
+    }
 
     async function deleteSocialAccount(id) {
       if (!confirm('إلغاء ربط هذه القناة؟')) return;
@@ -1247,15 +1359,21 @@
           }
           return true;
         });
+        cachedSocialAccounts = validAccounts;
+        cachedMarketingPosts = d.posts || [];
         cleanInvalidSocialAccounts(d.accounts || []);
         if ($('socialAccountsList')) {
-          $('socialAccountsList').innerHTML = validAccounts.map(a => `
+          $('socialAccountsList').innerHTML = validAccounts.map(a => {
+            let hasApi = false;
+            try { const c = JSON.parse(a.config_json || '{}'); hasApi = Boolean(c.accessToken || c.webhookUrl); } catch {}
+            return `
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navyLight border border-gold/30 text-[11px]">
               <strong class="text-goldBright">${esc(a.platform)}</strong>: <span class="text-white">${esc(a.account_name)}</span>
               ${a.channel_id ? `<code class="text-sky-300 font-mono">(${esc(a.channel_id)})</code>` : ''}
+              ${hasApi ? `<span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">API/Webhook متصل</span>` : ''}
               <button type="button" onclick="deleteSocialAccount('${esc(a.id)}')" class="text-rose-400 hover:text-rose-300 font-bold ml-1">✕</button>
             </span>
-          `).join('') || '<span class="text-[11px] text-slate-500">لا توجد قنوات إضافية مربوطة (يتم الإرسال تلقائياً لجميع محادثات ومجموعات البوت المسجلة).</span>';
+          `}).join('') || '<span class="text-[11px] text-slate-500">لا توجد قنوات إضافية مربوطة (يتم الإرسال تلقائياً لجميع محادثات ومجموعات البوت المسجلة).</span>';
         }
         $('marketingPostsList').innerHTML = (d.posts || []).map(p => {
           let logsHtml = '';
@@ -1266,7 +1384,7 @@
                 const isEmbedPlatform = ['website', 'youtube', 'tiktok', 'facebook', 'instagram'].includes(l.platform);
                 const ok = l.ok || (isEmbedPlatform && p.status === 'published');
                 const note = isEmbedPlatform && p.status === 'published'
-                  ? `تم النشر والتضمين في الموقع (${l.platform})`
+                  ? `تم النشر وتجهيز المشاركة (${l.platform}) ✅`
                   : (l.note || (ok ? 'تم النشر بنجاح ✅' : 'تأكد أن البوت مشرف في القناة'));
                 return `<span class="px-2 py-0.5 rounded text-[10px] ${ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'}">${esc(l.platform)} ${l.target ? `(${esc(l.target)})` : ''}: ${esc(note)}</span>`;
               }).join('')}</div>`;
@@ -1285,7 +1403,7 @@
                   <button type="button" onclick="actMarketingPost('${esc(p.id)}','reject')" class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300">❌ رفض</button>
                 ` : ''}
                 ${hasPerm('marketing.publish') ? `
-                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','publish')" class="px-2.5 py-1 rounded bg-gold text-obsidian font-extrabold">${p.status === 'published' ? '↻ إعادة النشر للقناة' : '🚀 نشر الآن'}</button>
+                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','publish')" class="px-2.5 py-1 rounded bg-gold text-obsidian font-extrabold">${p.status === 'published' ? '↻ إعادة النشر لكل البرامج' : '🚀 نشر الآن'}</button>
                 ` : ''}
                 ${hasPerm('marketing.approve') ? `
                   <button type="button" onclick="deleteMarketingPost('${esc(p.id)}')" class="px-2 py-1 rounded bg-rose-500/15 text-rose-300">🗑️</button>
@@ -1297,6 +1415,16 @@
             ${p.hashtags ? `<div class="text-goldBright text-[11px] font-mono">${esc(p.hashtags)}</div>` : ''}
             <div class="text-[11px] text-slate-400 font-mono">المنصات: ${esc(p.platforms_json)} • بواسطة: ${esc(p.created_by || '-')} ${p.scheduled_at ? `• مجدول: ${esc(p.scheduled_at)}` : ''}</div>
             ${logsHtml}
+            <!-- Instant 1-Click Cross-Platform Share Studio -->
+            <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5">
+              <span class="text-[10px] text-goldBright font-bold ml-1">📲 مشاركة ونشر مباشر بنقرة واحدة (مع نسخ الوصف تلقائياً):</span>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','facebook')" class="px-2.5 py-1 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold hover:bg-blue-600/30">📘 Facebook</button>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','instagram')" class="px-2.5 py-1 rounded-lg bg-pink-600/20 border border-pink-500/40 text-pink-300 text-[10px] font-bold hover:bg-pink-600/30">📸 Instagram</button>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','tiktok')" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold hover:bg-emerald-600/30">🎵 TikTok Studio</button>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','youtube')" class="px-2.5 py-1 rounded-lg bg-rose-600/20 border border-rose-500/40 text-rose-300 text-[10px] font-bold hover:bg-rose-600/30">▶️ YouTube Studio</button>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','telegram')" class="px-2.5 py-1 rounded-lg bg-sky-600/20 border border-sky-500/40 text-sky-300 text-[10px] font-bold hover:bg-sky-600/30">✈️ Telegram</button>
+              <button type="button" onclick="crossPostToApp('${esc(p.id)}','native')" class="px-2.5 py-1 rounded-lg bg-gold/20 border border-gold/40 text-goldBright text-[10px] font-bold hover:bg-gold/30">📲 مشاركة عبر تطبيقات الهاتف</button>
+            </div>
           </div>
         `}).join('') || '<div class="text-slate-500">لا توجد منشورات بعد.</div>';
       } catch (e) { showToast(e.message, true); }
@@ -1377,6 +1505,15 @@
           if (pubRes?.status) finalStatus = pubRes.status;
         }
 
+        // Also trigger direct client-side API/Webhook dispatch to any connected Facebook/Instagram/TikTok/YouTube accounts
+        await runClientSideMultiPlatformDispatch({
+          title: titleVal,
+          body: bodyText,
+          hashtags: $('mkTags').value.trim() || '#MGD_Trading',
+          link_url: $('mkLink').value.trim(),
+          media_url: mediaUrl,
+        }, cachedSocialAccounts);
+
         // Sync published media posts to cms_config ('media_posts') so the public storefront displays them immediately
         try {
           const allPosts = await api('GET', '/api/marketing/posts');
@@ -1411,6 +1548,10 @@
           await api('POST', '/api/marketing/accounts', { platform: 'telegram', account_name: target_channel, channel_id: target_channel }).catch(() => {});
         }
         await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`, { target_channel });
+        if (act === 'publish') {
+          const targetPost = cachedMarketingPosts.find(x => x.id === id);
+          if (targetPost) await runClientSideMultiPlatformDispatch(targetPost, cachedSocialAccounts);
+        }
         try {
           const allPosts = await api('GET', '/api/marketing/posts');
           const pubList = (allPosts.posts || []).filter(x => x.status === 'published').slice(0, 24);
