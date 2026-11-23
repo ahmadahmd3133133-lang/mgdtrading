@@ -314,7 +314,30 @@
       <section id="sec-marketing" class="admin-sec hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-4">
-            <h2 class="text-base font-extrabold gold-gradient-text">📣 مركز التسويق والنشر (MGD SOCIAL MEDIA CENTER)</h2>
+            <h2 class="text-base font-extrabold gold-gradient-text">📣 مركز النشر الشامل والقنوات (فيديو • صور • منشورات • ملفات)</h2>
+            <p class="text-[11px] text-slate-400">انشر أي فيديو من (YouTube, TikTok, Facebook, Instagram أو MP4 مباشر) أو ارفع صورة/ملف من جهازك ليُنشر فوراً في الموقع وعلى قناة ومجموعات تيليجرام.</p>
+
+            <!-- Connected Channels / Accounts Box -->
+            <div class="p-3 rounded-xl bg-obsidian/80 border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-goldBright">📡 القنوات والحسابات المربوطة للنشر التلقائي</span>
+                <span class="text-[10px] text-slate-400">أضف البوت مشرفاً (Admin) في قناتك</span>
+              </div>
+              <form id="socialAccountForm" class="grid grid-cols-1 sm:grid-cols-12 gap-1.5">
+                <select id="saPlatform" class="input-field text-[11px] sm:col-span-3">
+                  <option value="telegram">Telegram</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                </select>
+                <input id="saName" type="text" required placeholder="اسم القناة (مثال: قناة التوصيات)" class="input-field text-[11px] sm:col-span-4" />
+                <input id="saChannelId" type="text" required placeholder="@forxvipaml أو @mgdtrading" class="input-field text-[11px] sm:col-span-3 font-mono" dir="ltr" />
+                <button type="submit" class="py-1.5 px-2 rounded-lg bg-gold text-obsidian text-[11px] font-extrabold sm:col-span-2">+ ربط</button>
+              </form>
+              <div id="socialAccountsList" class="flex flex-wrap gap-1.5 pt-1"></div>
+            </div>
+
             <div class="p-3 rounded-xl bg-obsidian/70 border border-gold/30 space-y-2">
               <label class="block text-xs font-bold text-goldBright">🤖 توليد إعلان أو منشور بالذكاء الاصطناعي</label>
               <div class="flex gap-2">
@@ -322,14 +345,27 @@
                 <button type="button" onclick="generateMarketingAI()" class="px-3 py-2 rounded-xl bg-gold text-obsidian text-xs font-extrabold shrink-0">توليد</button>
               </div>
             </div>
+
             <form id="marketingPostForm" class="space-y-3">
               <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">عنوان الحملة / المنشور</label>
-                <input id="mkTitle" type="text" class="input-field" placeholder="عرض خاص لمتداولي الذهب" />
+                <label class="block text-xs font-bold text-slate-300 mb-1">عنوان الفيديو / المنشور</label>
+                <input id="mkTitle" type="text" class="input-field" placeholder="مثال: شرح نتائج بوت الذهب المباشرة أو عرض خاص" />
               </div>
+
+              <!-- Universal Video / Media URL Input + Instant Preview -->
+              <div class="p-3 rounded-xl bg-navyLight/60 border border-gold/30 space-y-2">
+                <label class="block text-xs font-extrabold text-goldBright">🎬 رابط فيديو من أي برنامج (YouTube / TikTok / Facebook / Instagram / MP4) أو رابط صورة</label>
+                <input id="mkMediaUrl" type="url" oninput="previewMarketingMedia()" class="input-field text-xs font-mono" placeholder="https://www.youtube.com/watch?v=... أو تيك توك / فيسبوك / انستقرام" dir="ltr" />
+                <div class="flex items-center justify-between gap-2 pt-1">
+                  <label class="text-[11px] text-slate-300 font-bold">🖼️ أو ارفع صورة / فيديو قصير من جهازك:</label>
+                  <input id="mkMediaFile" type="file" accept="image/*,video/mp4,video/webm,.pdf,.zip,.ex5" class="text-[11px] text-slate-300 max-w-[210px]" />
+                </div>
+                <div id="mkMediaPreviewBox" class="hidden pt-2"></div>
+              </div>
+
               <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">نص المنشور *</label>
-                <textarea id="mkBody" rows="4" required class="input-field" placeholder="اكتب نص الإعلان أو المنشور..."></textarea>
+                <label class="block text-xs font-bold text-slate-300 mb-1">نص المنشور / الوصف *</label>
+                <textarea id="mkBody" rows="3" required class="input-field" placeholder="اكتب نص المنشور أو شرح الفيديو..."></textarea>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -337,41 +373,50 @@
                   <input id="mkTags" type="text" class="input-field text-xs" placeholder="#MGD #Gold #MT5" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-300 mb-1">الرابط المرفق</label>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">رابط إضافي (زر / موقع)</label>
                   <input id="mkLink" type="url" class="input-field text-xs" value="https://mgdtrading.vercel.app/#store" dir="ltr" />
                 </div>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">المنصات المستهدفة</label>
+                <label class="block text-xs font-bold text-slate-300 mb-1">وجهات النشر والمنصات</label>
                 <div class="flex flex-wrap gap-3 text-xs bg-obsidian/70 p-2.5 rounded-xl border border-slate-800">
-                  <label class="flex items-center gap-1"><input type="checkbox" value="telegram" checked class="mk-plat accent-gold" /> Telegram</label>
+                  <label class="flex items-center gap-1 text-goldBright font-bold"><input type="checkbox" value="website" checked class="mk-plat accent-gold" /> 🌐 الموقع الرسمي</label>
+                  <label class="flex items-center gap-1 text-sky-300 font-bold"><input type="checkbox" value="telegram" checked class="mk-plat accent-gold" /> ✈️ قناة ومجموعات Telegram</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="youtube" class="mk-plat accent-gold" /> YouTube</label>
+                  <label class="flex items-center gap-1"><input type="checkbox" value="tiktok" class="mk-plat accent-gold" /> TikTok</label>
                   <label class="flex items-center gap-1"><input type="checkbox" value="facebook" class="mk-plat accent-gold" /> Facebook</label>
                   <label class="flex items-center gap-1"><input type="checkbox" value="instagram" class="mk-plat accent-gold" /> Instagram</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="tiktok" class="mk-plat accent-gold" /> TikTok</label>
-                  <label class="flex items-center gap-1"><input type="checkbox" value="youtube" class="mk-plat accent-gold" /> YouTube</label>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">قناة تيليجرام إضافية (اختياري)</label>
+                  <input id="mkTargetChannel" type="text" class="input-field text-xs font-mono" placeholder="@forxvipaml" dir="ltr" />
+                </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-300 mb-1">موعد الجدولة (اختياري)</label>
                   <input id="mkSchedule" type="datetime-local" class="input-field text-xs" dir="ltr" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-300 mb-1">الإجراء</label>
-                  <select id="mkStatus" class="input-field text-xs">
-                    <option value="pending_approval">إرسال لموافقة المدير</option>
-                    <option value="scheduled">جدولة النشر</option>
-                    <option value="draft">حفظ كمسودة</option>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">طريقة النشر</label>
+                  <select id="mkStatus" class="input-field text-xs font-bold">
+                    <option value="publish_now">🚀 نشر فوري الآن (للقناة والموقع)</option>
+                    <option value="pending_approval">⏳ إرسال لموافقة المدير</option>
+                    <option value="scheduled">📅 جدولة النشر</option>
+                    <option value="draft">📝 حفظ كمسودة</option>
                   </select>
                 </div>
               </div>
-              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">حفظ المنشور في تقويم التسويق</button>
+              <button id="mkSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold shadow-lg">🚀 تنفيذ وحفظ المنشور / الفيديو الآن</button>
             </form>
           </div>
 
           <div class="lg:col-span-7 glass-card rounded-2xl p-5 space-y-4">
-            <h2 class="text-base font-extrabold text-white">📅 تقويم المنشورات، سير الموافقات، وسجل النشر</h2>
-            <div id="marketingPostsList" class="space-y-3 text-xs"></div>
+            <div class="flex items-center justify-between">
+              <h2 class="text-base font-extrabold text-white">🎬 المنشورات والفيديوهات المنشورة وسجل الإرسال للقنوات</h2>
+              <button type="button" onclick="loadMarketing()" class="px-3 py-1 rounded-lg bg-navyLight border border-gold/30 text-goldBright text-xs font-bold">↻ تحديث</button>
+            </div>
+            <div id="marketingPostsList" class="space-y-3 text-xs max-h-[750px] overflow-y-auto pr-1"></div>
           </div>
         </div>
       </section>
@@ -466,6 +511,10 @@
                 <label class="block text-xs font-bold text-slate-300 mb-1">صورة المنتج</label>
                 <input id="fImageInput" type="file" accept="image/*" class="input-field text-xs" />
               </div>
+              <div>
+                <label class="block text-xs font-bold text-goldBright mb-1">🎬 رابط فيديو شرح المنتج (YouTube / TikTok / Facebook / Instagram / MP4)</label>
+                <input id="fVideoUrl" type="url" class="input-field text-xs font-mono" placeholder="https://www.youtube.com/watch?v=... أو رابط تيك توك / فيسبوك" dir="ltr" />
+              </div>
               <button id="saveProductBtn" type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">💾 حفظ ونشر المنتج</button>
             </form>
           </div>
@@ -538,8 +587,9 @@
               </div>
               <div><label class="text-xs text-slate-300">عنوان الدرس *</label><input id="acTitle" type="text" required class="input-field" /></div>
               <div><label class="text-xs text-slate-300">شرح الدرس *</label><textarea id="acDesc" rows="3" required class="input-field"></textarea></div>
-              <div><label class="text-xs text-slate-300">رابط الفيديو (اختياري)</label><input id="acVideo" type="url" class="input-field text-xs" dir="ltr" /></div>
-              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">نشر الدرس في الأكاديمية</button>
+              <div><label class="text-xs font-bold text-goldBright">🎬 رابط الفيديو (YouTube / TikTok / Facebook / Instagram / MP4)</label><input id="acVideo" type="url" class="input-field text-xs font-mono" placeholder="https://www.youtube.com/watch?v=... أو تيك توك / فيسبوك / انستقرام" dir="ltr" /></div>
+              <label class="flex items-center gap-2 text-xs text-sky-300 font-bold"><input id="acSendChannel" type="checkbox" checked class="accent-gold" /> ✈️ نشر الدرس والفيديو على قناة ومجموعات تيليجرام أيضاً</label>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian text-xs font-extrabold">نشر الدرس والفيديو في الأكاديمية</button>
             </form>
           </div>
           <div class="lg:col-span-8 glass-card rounded-2xl p-5 space-y-3">
@@ -1011,7 +1061,109 @@
       } catch (e) { showToast(e.message, true); }
     }
 
-    // --- 4. Marketing & Social Media Center ---
+    // --- 4. Marketing & Social Media Center (Universal Video, Image & Channel Publisher) ---
+    let selectedMkMediaB64 = null;
+    let selectedMkMediaExt = 'png';
+
+    function renderUniversalMediaEmbed(url) {
+      const u = String(url || '').trim();
+      if (!u) return '';
+      const lower = u.toLowerCase().split('?')[0];
+
+      // 1) YouTube (watch, youtu.be, shorts, embed)
+      const ytMatch = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (ytMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black aspect-video"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+      }
+      // 2) TikTok
+      const ttMatch = u.match(/tiktok\.com\/.*\/video\/(\d+)/);
+      if (ttMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black h-[420px] flex justify-center"><iframe src="https://www.tiktok.com/embed/v2/${ttMatch[1]}" class="w-full max-w-[340px] h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      if (u.includes('tiktok.com')) {
+        return `<div class="p-3 rounded-xl bg-obsidian border border-gold/30 flex items-center justify-between"><span class="text-goldBright font-bold">🎵 فيديو TikTok</span><a href="${esc(u)}" target="_blank" rel="noopener" class="px-3 py-1 rounded-lg bg-gold text-obsidian font-extrabold">مشاهدة على TikTok ↗</a></div>`;
+      }
+      // 3) Facebook Video / Reel
+      if (u.includes('facebook.com') || u.includes('fb.watch')) {
+        const enc = encodeURIComponent(u);
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black aspect-video"><iframe src="https://www.facebook.com/plugins/video.php?href=${enc}&show_text=false" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      // 4) Instagram Post / Reel
+      const igMatch = u.match(/instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+      if (igMatch) {
+        return `<div class="rounded-xl overflow-hidden border border-gold/30 bg-black h-[420px]"><iframe src="https://www.instagram.com/p/${igMatch[1]}/embed" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>`;
+      }
+      // 5) Direct Video (.mp4 / .webm / .mov)
+      if (/\.(mp4|webm|mov|m4v)$/.test(lower)) {
+        return `<video src="${esc(u)}" controls class="w-full max-h-72 rounded-xl border border-gold/30 bg-black"></video>`;
+      }
+      // 6) Direct Image
+      if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(lower) || u.includes('/assets/media/') || u.includes('/assets/products/')) {
+        return `<img src="${esc(u)}" class="w-full max-h-64 object-contain rounded-xl border border-gold/30 bg-obsidian" onerror="this.style.display='none'" />`;
+      }
+      // 7) Any other link / file
+      return `<div class="p-2.5 rounded-xl bg-obsidian border border-slate-700 flex items-center justify-between"><span class="text-slate-300 truncate font-mono text-[11px]">${esc(u)}</span><a href="${esc(u)}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-gold/20 text-goldBright font-bold shrink-0">فتح الرابط ↗</a></div>`;
+    }
+
+    function previewMarketingMedia() {
+      const url = $('mkMediaUrl').value.trim();
+      const box = $('mkMediaPreviewBox');
+      if (!url) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+      box.innerHTML = renderUniversalMediaEmbed(url);
+      box.classList.remove('hidden');
+    }
+
+    $('mkMediaFile')?.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      const box = $('mkMediaPreviewBox');
+      if (!file) { selectedMkMediaB64 = null; return; }
+      if (file.size > 15 * 1024 * 1024) {
+        showToast('حجم الملف كبير جداً (الحد الأقصى للرفع المباشر 15MB، أو ضع رابط يوتيوب/تيك توك/فيسبوك)', true);
+        e.target.value = '';
+        return;
+      }
+      const r = new FileReader();
+      r.onload = () => {
+        selectedMkMediaB64 = String(r.result || '').replace(/^data:[^;]+;base64,/, '');
+        selectedMkMediaExt = (file.name.split('.').pop() || 'png').toLowerCase();
+        if (file.type.startsWith('image/')) {
+          box.innerHTML = `<img src="${r.result}" class="max-h-48 rounded-xl border border-gold/40 mx-auto" />`;
+        } else if (file.type.startsWith('video/')) {
+          box.innerHTML = `<video src="${r.result}" controls class="max-h-48 rounded-xl border border-gold/40 mx-auto"></video>`;
+        } else {
+          box.innerHTML = `<div class="p-2 rounded-lg bg-obsidian text-goldBright font-mono text-xs">📎 ملف جاهز للرفع: ${esc(file.name)}</div>`;
+        }
+        box.classList.remove('hidden');
+      };
+      r.readAsDataURL(file);
+    });
+
+    $('socialAccountForm')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/marketing/accounts', {
+          platform: $('saPlatform').value,
+          account_name: $('saName').value.trim(),
+          channel_id: $('saChannelId').value.trim(),
+        });
+        $('socialAccountForm').reset();
+        showToast('✅ تم ربط القناة/الحساب بنجاح!');
+        loadMarketing();
+      } catch (err) { showToast(err.message, true); }
+    });
+
+    async function deleteSocialAccount(id) {
+      if (!confirm('إلغاء ربط هذه القناة؟')) return;
+      try { await api('DELETE', `/api/marketing/accounts/${encodeURIComponent(id)}`); showToast('تم الحذف'); loadMarketing(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
+    async function deleteMarketingPost(id) {
+      if (!confirm('حذف هذا المنشور؟')) return;
+      try { await api('DELETE', `/api/marketing/posts/${encodeURIComponent(id)}`); showToast('تم حذف المنشور'); loadMarketing(); }
+      catch (e) { showToast(e.message, true); }
+    }
+
     async function generateMarketingAI() {
       const prompt = $('mkAiPrompt').value.trim();
       try {
@@ -1029,52 +1181,86 @@
     async function loadMarketing() {
       try {
         const d = await api('GET', '/api/marketing/posts');
-        $('marketingPostsList').innerHTML = (d.posts || []).map(p => `
-          <div class="p-4 rounded-2xl bg-obsidian/75 border border-slate-800 space-y-2">
+        if ($('socialAccountsList')) {
+          $('socialAccountsList').innerHTML = (d.accounts || []).map(a => `
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navyLight border border-gold/30 text-[11px]">
+              <strong class="text-goldBright">${esc(a.platform)}</strong>: <span class="text-white">${esc(a.account_name)}</span>
+              ${a.channel_id ? `<code class="text-sky-300 font-mono">(${esc(a.channel_id)})</code>` : ''}
+              <button type="button" onclick="deleteSocialAccount('${esc(a.id)}')" class="text-rose-400 hover:text-rose-300 font-bold ml-1">✕</button>
+            </span>
+          `).join('') || '<span class="text-[11px] text-slate-500">لا توجد قنوات إضافية مربوطة (يتم الإرسال تلقائياً لجميع محادثات ومجموعات البوت المسجلة).</span>';
+        }
+        $('marketingPostsList').innerHTML = (d.posts || []).map(p => {
+          let logsHtml = '';
+          try {
+            const logs = JSON.parse(p.publish_log_json || '[]');
+            if (Array.isArray(logs) && logs.length) {
+              logsHtml = `<div class="flex flex-wrap gap-1.5 pt-1">${logs.map(l => `<span class="px-2 py-0.5 rounded text-[10px] ${l.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'}">${esc(l.platform)} ${l.target ? `(${esc(l.target)})` : ''}: ${esc(l.note || (l.ok ? 'تم النشر' : 'تنبيه'))}</span>`).join('')}</div>`;
+            }
+          } catch {}
+          return `
+          <div class="p-4 rounded-2xl bg-obsidian/75 border border-slate-800 space-y-2.5">
             <div class="flex items-center justify-between gap-2">
               <div>
-                <strong class="text-white">${esc(p.title || 'منشور تسويقي')}</strong>
-                <span class="px-2 py-0.5 rounded bg-gold/20 text-goldBright text-[10px] font-bold mr-1">${esc(p.status)}</span>
+                <strong class="text-white text-sm">${esc(p.title || 'منشور / فيديو')}</strong>
+                <span class="px-2 py-0.5 rounded ${p.status === 'published' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-gold/20 text-goldBright'} text-[10px] font-bold mr-1">${esc(p.status)}</span>
               </div>
               <div class="flex gap-1.5">
                 ${hasPerm('marketing.approve') && p.status === 'pending_approval' ? `
                   <button type="button" onclick="actMarketingPost('${esc(p.id)}','approve')" class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold">✅ اعتماد</button>
                   <button type="button" onclick="actMarketingPost('${esc(p.id)}','reject')" class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300">❌ رفض</button>
                 ` : ''}
-                ${hasPerm('marketing.publish') && p.status !== 'published' ? `
-                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','publish')" class="px-2.5 py-1 rounded bg-gold text-obsidian font-extrabold">🚀 نشر الآن</button>
+                ${hasPerm('marketing.publish') ? `
+                  <button type="button" onclick="actMarketingPost('${esc(p.id)}','publish')" class="px-2.5 py-1 rounded bg-gold text-obsidian font-extrabold">${p.status === 'published' ? '↻ إعادة النشر للقناة' : '🚀 نشر الآن'}</button>
+                ` : ''}
+                ${hasPerm('marketing.approve') ? `
+                  <button type="button" onclick="deleteMarketingPost('${esc(p.id)}')" class="px-2 py-1 rounded bg-rose-500/15 text-rose-300">🗑️</button>
                 ` : ''}
               </div>
             </div>
+            ${p.media_url ? renderUniversalMediaEmbed(p.media_url) : ''}
             <p class="text-slate-300 whitespace-pre-line">${esc(p.body)}</p>
+            ${p.hashtags ? `<div class="text-goldBright text-[11px] font-mono">${esc(p.hashtags)}</div>` : ''}
             <div class="text-[11px] text-slate-400 font-mono">المنصات: ${esc(p.platforms_json)} • بواسطة: ${esc(p.created_by || '-')} ${p.scheduled_at ? `• مجدول: ${esc(p.scheduled_at)}` : ''}</div>
+            ${logsHtml}
           </div>
-        `).join('') || '<div class="text-slate-500">لا توجد منشورات بعد.</div>';
+        `}).join('') || '<div class="text-slate-500">لا توجد منشورات بعد.</div>';
       } catch (e) { showToast(e.message, true); }
     }
 
     $('marketingPostForm').addEventListener('submit', async e => {
       e.preventDefault();
       const platforms = Array.from(document.querySelectorAll('.mk-plat:checked')).map(c => c.value);
+      const btn = $('mkSubmitBtn');
+      const origText = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري رفع ونشر المحتوى...'; }
       try {
-        await api('POST', '/api/marketing/posts', {
+        const res = await api('POST', '/api/marketing/posts', {
           title: $('mkTitle').value.trim(),
           body: $('mkBody').value.trim(),
           hashtags: $('mkTags').value.trim(),
           link_url: $('mkLink').value.trim(),
+          media_url: $('mkMediaUrl').value.trim(),
+          ...(selectedMkMediaB64 ? { mediaBase64: selectedMkMediaB64, mediaExt: selectedMkMediaExt } : {}),
+          target_channel: $('mkTargetChannel')?.value.trim() || '',
           platforms,
           scheduled_at: $('mkSchedule').value || null,
           status: $('mkStatus').value,
         });
         $('marketingPostForm').reset();
-        showToast('✅ تم حفظ المنشور في مركز التسويق!');
+        selectedMkMediaB64 = null;
+        $('mkMediaPreviewBox').classList.add('hidden');
+        $('mkMediaPreviewBox').innerHTML = '';
+        showToast(res.status === 'published' ? '🚀 تم نشر الفيديو/المنشور فوراً على القناة والموقع!' : '✅ تم حفظ المنشور في مركز التسويق!');
         loadMarketing();
       } catch (err) { showToast(err.message, true); }
+      finally { if (btn) { btn.disabled = false; btn.textContent = origText; } }
     });
 
     async function actMarketingPost(id, act) {
-      if (act === 'publish' && !confirm('تأكيد النشر الفوري للمنشور على المنصات المحددة؟')) return;
-      try { await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`); showToast('تم تنفيذ الإجراء بنجاح!'); loadMarketing(); }
+      const target_channel = $('mkTargetChannel')?.value.trim() || '';
+      if (act === 'publish' && !confirm('تأكيد النشر الفوري للمنشور/الفيديو على القناة والمنصات المحددة؟')) return;
+      try { await api('POST', `/api/marketing/posts/${encodeURIComponent(id)}/${act}`, { target_channel }); showToast('🚀 تم تنفيذ الإجراء والنشر بنجاح!'); loadMarketing(); }
       catch (e) { showToast(e.message, true); }
     }
 
@@ -1143,6 +1329,7 @@
       $('fDesc').value = p.desc || '';
       $('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
       $('fExistingImage').value = p.image || '';
+      if ($('fVideoUrl')) $('fVideoUrl').value = p.videoUrl || '';
       $('prodFormHeading').textContent = `تعديل: ${p.name}`;
       $('prodResetBtn').classList.remove('hidden');
     }
@@ -1151,6 +1338,7 @@
       $('productForm').reset();
       $('fId').value = '';
       $('fExistingImage').value = '';
+      if ($('fVideoUrl')) $('fVideoUrl').value = '';
       selectedImageB64 = null;
       $('prodFormHeading').textContent = 'إضافة / تعديل منتج';
       $('prodResetBtn').classList.add('hidden');
@@ -1171,6 +1359,7 @@
           maxDevices: Number($('fMaxDevices').value || 1),
           symbol: $('fSymbol').value.trim(),
           desc: $('fDesc').value.trim(),
+          videoUrl: $('fVideoUrl')?.value.trim() || '',
           features: $('fFeatures').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean),
           ...( $('fExistingImage').value && !selectedImageB64 ? { image: $('fExistingImage').value } : {} ),
           ...( selectedImageB64 ? { imageBase64: selectedImageB64, imageExt: selectedImageExt } : {} ),
@@ -1274,9 +1463,12 @@
       try {
         const d = await api('GET', '/api/academy');
         $('academyListBox').innerHTML = (d.lessons || []).map(l => `
-          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 flex items-center justify-between">
-            <div><strong class="text-goldBright">#${esc(l.num)} ${esc(l.title)}</strong> <span class="text-slate-400">(${esc(l.category)})</span><div class="text-slate-400 text-[11px]">${esc(l.description)}</div></div>
-            <button type="button" onclick="deleteLesson('${esc(l.id)}')" class="text-rose-400">🗑️</button>
+          <div class="p-3.5 rounded-xl bg-obsidian/75 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <div><strong class="text-goldBright">#${esc(l.num)} ${esc(l.title)}</strong> <span class="text-slate-400">(${esc(l.category)})</span><div class="text-slate-400 text-[11px]">${esc(l.description)}</div></div>
+              <button type="button" onclick="deleteLesson('${esc(l.id)}')" class="text-rose-400">🗑️</button>
+            </div>
+            ${l.video_url ? renderUniversalMediaEmbed(l.video_url) : ''}
           </div>
         `).join('') || '<div class="text-slate-500">لم تُضف دروس إضافية بعد (80 درساً أساسياً نشطة في الموقع).</div>';
       } catch (e) { showToast(e.message, true); }
@@ -1290,6 +1482,7 @@
           title: $('acTitle').value.trim(),
           description: $('acDesc').value.trim(),
           video_url: $('acVideo').value.trim(),
+          sendToChannel: Boolean($('acSendChannel')?.checked),
         });
         $('academyForm').reset();
         showToast('✅ تم نشر الدرس في الأكاديمية!');
