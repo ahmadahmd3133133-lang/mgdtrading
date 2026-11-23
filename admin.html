@@ -1239,7 +1239,8 @@
         let cfg = {};
         try { cfg = JSON.parse(acc.config_json || '{}'); } catch {}
         const token = String(cfg.accessToken || '').trim();
-        const webhookUrl = String(cfg.webhookUrl || (String(acc.channel_id || '').startsWith('http') ? acc.channel_id : '')).trim();
+        const isProfileUrl = /^https?:\/\/(?:www\.)?(?:facebook\.com|instagram\.com|tiktok\.com|youtube\.com|t\.me)\//i.test(String(acc.channel_id || '').trim());
+        const webhookUrl = String(cfg.webhookUrl || (!isProfileUrl && String(acc.channel_id || '').startsWith('http') ? acc.channel_id : '')).trim();
         const targetId = String(acc.channel_id || '').trim();
 
         if (webhookUrl && acc.platform !== 'telegram') {
