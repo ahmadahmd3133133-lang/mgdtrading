@@ -56,30 +56,5 @@
       "دعم فني وتحديثات مستمرة"
     ],
     "image": "./assets/products/MGD_Product_mwqs9wx8.jpg"
-  },
-  {
-    "id": "_media_asset_temp",
-    "name": "967775406067_status_d7c942d75c8344a6836429d9fa34bca4",
-    "platform": "MT5",
-    "category": "EA",
-    "price": 0,
-    "status": "جاهز للبيع",
-    "badge": "مجاني",
-    "version": "v1.0",
-    "symbol": "XAUUSD",
-    "timeframe": "M5 - H1",
-    "icon": "⚡",
-    "desc": "Media upload",
-    "features": [
-      "متوافق بالكامل مع منصة MT5",
-      "إدارة مخاطر ذكية وإشارات دقيقة",
-      "دعم فني وتحديثات مستمرة من MGD"
-    ],
-    "featured": false,
-    "hidden": false,
-    "licenseType": "lifetime",
-    "maxDevices": 1,
-    "sortOrder": 0,
-    "image": "./assets/products/967775406067_status_d7c942d75c8344a6836429d9fa34bca4_mwt90o9y.mp4"
   }
 ]
