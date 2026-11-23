@@ -1904,7 +1904,10 @@
         }
 
         // 3) Render Published Media / Videos / Channel Posts on Home Page
-        if (Array.isArray(data.mediaPosts) && data.mediaPosts.length) {
+        const mediaPostsList = (Array.isArray(data.mediaPosts) && data.mediaPosts.length)
+          ? data.mediaPosts
+          : (Array.isArray(data.config?.media_posts) ? data.config.media_posts : []);
+        if (mediaPostsList.length) {
           const homePanel = document.getElementById('pubPage-home');
           if (homePanel) {
             let feedBox = document.getElementById('mgdPublicMediaFeed');
@@ -1924,7 +1927,7 @@
                   <a href="https://t.me/forxvipaml" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 text-xs font-extrabold">انضم لقناة تيليجرام ↗</a>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  ${data.mediaPosts.map(mp => `
+                  ${mediaPostsList.map(mp => `
                     <div class="p-4 rounded-2xl bg-obsidian/85 border border-slate-800 flex flex-col justify-between space-y-3">
                       <div class="space-y-2.5">
                         ${mp.media_url ? renderPublicMediaEmbed(mp.media_url) : ''}
