@@ -164,6 +164,47 @@
         </div>
       </div>
 
+      <section id="landingFeatured" class="space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-gold/20 pb-4">
+          <div>
+            <span class="text-[11px] font-bold text-goldBright">اكتشف منظومة MGD</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1">منتجات مختارة</h2>
+            <p class="text-xs text-slate-400 mt-1">روبوتات ومؤشرات مختارة من متجر MGD</p>
+          </div>
+          <button type="button" data-pub-page="store" class="shrink-0 px-4 py-2 rounded-xl bg-navyLight border border-gold/40 text-goldBright text-xs font-bold hover:bg-gold/10 transition">عرض جميع المنتجات ←</button>
+        </div>
+        <div id="landingFeaturedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <section class="space-y-5 border-y border-gold/15 bg-navy/30 py-7">
+        <div>
+          <span class="text-[11px] font-bold text-goldBright">خدماتك في مكان واحد</span>
+          <h2 class="text-xl font-extrabold text-white mt-1">بوابات وخدمات MGD</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button type="button" data-pub-page="store" class="glass-card rounded-xl p-4 text-right border border-gold/25 hover:border-gold/60 transition">
+            <span class="text-xl" aria-hidden="true">🛒</span>
+            <span class="block text-sm font-extrabold text-white mt-2">متجر العملاء</span>
+            <span class="block text-[11px] text-slate-400 mt-1">تصفح المنتجات واطلبها</span>
+          </button>
+          <button type="button" data-pub-page="agencies" class="glass-card rounded-xl p-4 text-right border border-gold/25 hover:border-gold/60 transition">
+            <span class="text-xl" aria-hidden="true">🤝</span>
+            <span class="block text-sm font-extrabold text-white mt-2">الوكالات والشراكات</span>
+            <span class="block text-[11px] text-slate-400 mt-1">تفاصيل برنامج وكلاء MGD</span>
+          </button>
+          <a href="./staff-login.html" class="glass-card rounded-xl p-4 border border-gold/25 hover:border-gold/60 transition">
+            <span class="text-xl" aria-hidden="true">👥</span>
+            <span class="block text-sm font-extrabold text-white mt-2">بوابة الموظفين</span>
+            <span class="block text-[11px] text-slate-400 mt-1">دخول آمن حسب الصلاحيات</span>
+          </a>
+          <a href="./admin-login.html" class="glass-card rounded-xl p-4 border border-gold/25 hover:border-gold/60 transition">
+            <span class="text-xl" aria-hidden="true">🛡️</span>
+            <span class="block text-sm font-extrabold text-white mt-2">لوحة الإدارة</span>
+            <span class="block text-[11px] text-slate-400 mt-1">إدارة منظومة MGD</span>
+          </a>
+        </div>
+      </section>
+
       <!-- Bottom 3-Column Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="glass-card rounded-2xl p-5 space-y-3 border border-gold/25">
@@ -268,6 +309,8 @@
         </div>
         <div class="flex flex-wrap gap-3 pt-2">
           <a href="https://ct.topfx.com/?u=AliAmjd" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl bg-gradient-to-r from-gold to-goldBright text-obsidian font-extrabold text-sm hover:opacity-95 transition">فتح حساب تحت وكالة TopFX ↗</a>
+          <a href="https://www.upcomers.com/?code=dh3kzw75#challenges" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl bg-navyLight border border-gold/40 text-goldBright font-bold text-sm hover:bg-gold/10 transition">حساب ممول عبر Upcomers ↗</a>
+          <a href="https://partner.fundednext.com/partners/apply?ref=1Vlkutml" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl bg-navyLight border border-gold/40 text-goldBright font-bold text-sm hover:bg-gold/10 transition">حساب ممول عبر FundedNext ↗</a>
           <button type="button" data-pub-page="support" class="pub-nav-btn px-6 py-3 rounded-xl bg-navyLight border border-gold/40 text-goldBright font-bold text-sm hover:bg-gold/10 transition">تقديم طلب شراكة IB</button>
         </div>
       </div>
@@ -1418,6 +1461,30 @@
       `).join('');
     }
 
+    function renderLandingFeaturedProducts() {
+      const grid = document.getElementById('landingFeaturedGrid');
+      if (!grid) return;
+      const featured = products.slice(0, 6);
+      grid.innerHTML = featured.map(p => `
+        <article class="glass-card rounded-xl p-4 flex flex-col gap-3 border border-gold/25 hover:border-gold/60 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 shrink-0 rounded-lg bg-navyLight border border-gold/30 overflow-hidden flex items-center justify-center text-2xl">
+              ${p.image ? `<img src="${escHtml(p.image)}" alt="${escHtml(p.name)}" class="w-full h-full object-cover">` : escHtml(p.icon || '⚡')}
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] font-mono text-goldBright">${escHtml(p.platform || 'MGD')}</span>
+              <h3 class="text-sm font-extrabold text-white leading-snug">${escHtml(p.name)}</h3>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed line-clamp-2">${escHtml(p.desc || 'أداة تداول احترافية من منظومة MGD.')}</p>
+          <div class="flex items-center justify-between gap-2 mt-auto pt-2 border-t border-slate-800">
+            <span class="text-sm font-mono font-extrabold text-goldBright">${(p.price === null || p.price === undefined || p.price === '') ? escHtml(p.priceLabel || 'حسب الاتفاق') : (Number(p.price) === 0 ? 'مجاني' : '$' + Number(p.price).toLocaleString('en-US'))}</span>
+            <button type="button" data-pub-detail="${escHtml(p.id)}" class="px-3 py-1.5 rounded-lg bg-gold/15 border border-gold/40 text-goldBright text-[11px] font-bold hover:bg-gold/25 transition">التفاصيل والطلب</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
     function switchPublicPage(pageId, pushHist = true) {
       document.querySelectorAll('.pub-page-panel').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('header nav [data-pub-page]').forEach(btn => {
@@ -1462,6 +1529,7 @@
       });
       products = Array.from(byId.values());
       renderPublicStore();
+      renderLandingFeaturedProducts();
     }
 
     async function syncProductsFromRepoJson() {
@@ -1489,6 +1557,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       syncProductsFromRepoJson();
       syncProductsFromCloud();
+      renderLandingFeaturedProducts();
       const searchEl = document.getElementById('pubStoreSearch');
       if (searchEl) {
         searchEl.addEventListener('input', e => {
@@ -1532,6 +1601,7 @@
           const p = products.find(x => x.id === detBtn.dataset.pubDetail);
           const box = document.getElementById('pubProductDetailBox');
           if (p && box) {
+            if (!detBtn.closest('#pubPage-store')) switchPublicPage('store');
             const feats = Array.isArray(p.features) && p.features.length
               ? `<ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-2">${p.features.map(f => `<li class="flex items-center gap-2"><span class="text-goldBright">✓</span><span>${escHtml(f)}</span></li>`).join('')}</ul>`
               : '';
